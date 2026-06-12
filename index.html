@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Live Stream</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .player-wrap {
+      width: 100%;
+      max-width: 100vw;
+      position: relative;
+    }
+    video {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: #000;
+    }
+    .status {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(220, 38, 38, 0.9);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      z-index: 10;
+    }
+    .status.live { background: rgba(22, 163, 74, 0.9); }
+    .status.error { background: rgba(220, 38, 38, 0.9); }
+    .controls {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.7));
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .player-wrap:hover .controls { opacity: 1; }
+    .controls button {
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      font-size: 20px;
+      padding: 4px;
+    }
+    .controls .spacer { flex: 1; }
+    .error-msg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #ef4444;
+      text-align: center;
+      display: none;
+    }
+    .error-msg h3 { margin-bottom: 8px; }
+    .retry-btn {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="player-wrap" id="playerWrap">
+    <div class="status" id="status">CONNECTING...</div>
+    <video id="video" playsinline autoplay muted></video>
+    <div class="error-msg" id="errorMsg">
+      <h3>Stream Unavailable</h3>
+      <p>The stream may have ended or the token expired.</p>
+      <button class="retry-btn" onclick="initPlayer()">Retry</button>
+    </div>
+    <div class="controls">
+      <button id="playPause" onclick="togglePlay()">⏸</button>
+      <button onclick="toggleMute()">🔊</button>
+      <div class="spacer"></div>
+      <button onclick="goFullscreen()">⛶</button>
+    </div>
+  </div>
+
+  <script>
+    // Stream URL extracted from LiveTV embed
+    const STREAM_URL = 'https://a93.azplay34.me/hls/streama242328/index.m3u8?cst=af6e296c108c452da2c3c0fd3c6aabcb';
+    
+    const video = document.getElementById('video');
+    const status = document.getElementById('status');
+    const errorMsg = document.getElementById('errorMsg');
+    let hls;
+
+    function initPlayer() {
+      errorMsg.style.display = 'none';
+      status.textContent = 'CONNECTING...';
+      status.className = 'status';
+
+      if (hls) { hls.destroy(); }
+
+      if (Hls.isSupported()) {
+        hls = new Hls({
+          maxBufferLength: 10,
+          maxMaxBufferLength: 20,
+          liveSyncDurationCount: 3,
+          enableWorker: true,
+        });
+        hls.loadSource(STREAM_URL);
+        hls.attachMedia(video);
+        
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          video.play().catch(() => {});
+          status.textContent = '● LIVE';
+          status.className = 'status live';
+        });
+
+        hls.on(Hls.Events.ERROR, (_, data) => {
+          if (data.fatal) {
+            status.textContent = 'ERROR';
+            status.className = 'status error';
+            if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+              hls.startLoad();
+            } else {
+              errorMsg.style.display = 'block';
+            }
+          }
+        });
+
+      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Safari native HLS
+        video.src = STREAM_URL;
+        video.addEventListener('loadedmetadata', () => {
+          video.play().catch(() => {});
+          status.textContent = '● LIVE';
+          status.className = 'status live';
+        });
+      }
+    }
+
+    function togglePlay() {
+      if (video.paused) {
+        video.play();
+        document.getElementById('playPause').textContent = '⏸';
+      } else {
+        video.pause();
+        document.getElementById('playPause').textContent = '▶';
+      }
+    }
+
+    function toggleMute() {
+      video.muted = !video.muted;
+    }
+
+    function goFullscreen() {
+      const el = document.getElementById('playerWrap');
+      if (el.requestFullscreen) el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    }
+
+    // Auto-reconnect on stall
+    video.addEventListener('stalled', () => {
+      status.textContent = 'RECONNECTING...';
+      status.className = 'status';
+      setTimeout(() => initPlayer(), 3000);
+    });
+
+    initPlayer();
+  </script>
+</body>
+</html>
