@@ -214,21 +214,25 @@
       c.innerHTML=`
         <div class="nav-back" onclick="loadListings(currentSport)">← Kembali</div>
         <div class="section-title">${escHtml(matchName)}</div>
-        <div class="loading"><div class="spinner"></div>Mencari stream...</div>`;
+        <div class="loading"><div class="spinner"></div>Mencari stream yang aktif...</div>`;
       try{
-        const res=await fetch(`${API}/api/streams?url=${encodeURIComponent(matchUrl)}`);
+        // Use working-streams endpoint to find providers that actually work
+        const ctrl=new AbortController();
+        const timeout=setTimeout(()=>ctrl.abort(),120000); // 2min timeout for testing
+        const res=await fetch(`${API}/api/working-streams?url=${encodeURIComponent(matchUrl)}`,{signal:ctrl.signal});
+        clearTimeout(timeout);
         const streams=await res.json();
         if(!streams.length){
           c.innerHTML=`<div class="nav-back" onclick="loadListings(currentSport)">← Kembali</div>
-            <div class="section-title">${escHtml(matchName)}</div><div class="empty">Belum ada stream.</div>`;
+            <div class="section-title">${escHtml(matchName)}</div><div class="empty">Tidak ada stream aktif ditemukan.</div>`;
           return;
         }
         c.innerHTML=`
           <div class="nav-back" onclick="loadListings(currentSport)">← Kembali</div>
-          <div class="section-title">${escHtml(matchName)} — ${streams.length} provider</div>
+          <div class="section-title">${escHtml(matchName)} — ${streams.length} stream aktif</div>
           <div class="stream-list">
             ${streams.map((s,i)=>`
-              <div class="stream-card" onclick="playStream('${escAttr(s.url)}','${escAttr(s.name)}')">
+              <div class="stream-card" onclick="playM3u8Direct('${escAttr(s.m3u8)}')">
                 <div class="server-dot"></div>
                 <div class="server-name">${escHtml(s.name)}</div>
                 <div class="server-channel">${escHtml(s.channel||'')}</div>
@@ -237,8 +241,16 @@
           </div>`;
       }catch{
         c.innerHTML=`<div class="nav-back" onclick="loadListings(currentSport)">← Kembali</div>
-          <div class="empty">Gagal load stream.</div>`;
+          <div class="empty">Gagal mencari stream.</div>`;
       }
+    }
+
+    // Play m3u8 directly (no API call needed, already resolved)
+    function playM3u8Direct(m3u8Url){
+      showPlayer();
+      setLabel('CONNECTING...');
+      showLoading(true);
+      playM3u8(m3u8Url);
     }
 
     // ─── Play stream (tries m3u8 first, falls back to iframe) ─────

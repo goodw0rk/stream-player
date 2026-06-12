@@ -604,6 +604,52 @@ app.get('/api/m3u8', async (req, res) => {
   }
 });
 
+// ─── Working streams: test providers in parallel, return only working ones ─
+app.get('/api/working-streams', async (req, res) => {
+  if (!req.query.url) return res.status(400).json({ error: 'Missing url' });
+  const matchUrl = req.query.url;
+  try {
+    // Get all providers for this match
+    const providers = await getFootybitezStreams(matchUrl);
+    if (!providers.length) return res.json([]);
+
+    console.log(`[working-streams] Testing ${providers.length} providers for ${matchUrl.split('/').pop()}`);
+
+    // Test providers in batches of 5 (limited by browser concurrency)
+    const results = [];
+    const BATCH_SIZE = 5;
+    for (let i = 0; i < providers.length; i += BATCH_SIZE) {
+      const batch = providers.slice(i, i + BATCH_SIZE);
+      const batchResults = await Promise.allSettled(
+        batch.map(async (p) => {
+          try {
+            const m3u8 = await extractM3u8(p.url);
+            if (m3u8) {
+              return { ...p, m3u8 };
+            }
+            return null;
+          } catch {
+            return null;
+          }
+        })
+      );
+      for (const r of batchResults) {
+        if (r.status === 'fulfilled' && r.value) {
+          results.push(r.value);
+        }
+      }
+      // Stop early if we found enough working streams
+      if (results.length >= 5) break;
+    }
+
+    console.log(`[working-streams] ${results.length}/${providers.length} working`);
+    res.json(results);
+  } catch (err) {
+    console.error('[working-streams] Error:', err.message);
+    res.status(500).json({ error: 'Failed to find working streams' });
+  }
+});
+
 // ─── Health check ───────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, activePages, browser: !!browser });
