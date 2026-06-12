@@ -8,7 +8,7 @@
   <style>
     :root{--bg:#0a0a0a;--card:#161616;--card-hover:#1e1e1e;--accent:#e11d48;--accent-glow:rgba(225,29,72,0.3);--green:#16a34a;--text:#f0f0f0;--text-dim:#888;--border:#2a2a2a;--radius:14px}
     *{margin:0;padding:0;box-sizing:border-box}
-    body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'SF Pro',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+    body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'SF Pro',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
     .topbar{position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:12px 16px 0;border-bottom:1px solid var(--border)}
     .topbar h1{font-size:20px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
     .topbar h1 .dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
@@ -24,23 +24,41 @@
     .player-container.show{display:block}
     .player-container video{width:100%;height:100%;display:block;object-fit:contain;background:#000}
 
-    /* Stream label (top-left) — fades out */
+    /* Fullscreen: force landscape-capable fill */
+    .player-container:fullscreen,
+    .player-container:-webkit-full-screen{
+      width:100vw!important;height:100vh!important;aspect-ratio:auto!important;display:flex!important;align-items:center;justify-content:center;
+    }
+    .player-container:fullscreen video,
+    .player-container:-webkit-full-screen video{
+      width:100%;height:100%;object-fit:contain;
+    }
+    .player-container:fullscreen .player-bar,
+    .player-container:-webkit-full-screen .player-bar{padding:16px 20px}
+    .player-container:fullscreen .player-bar button,
+    .player-container:-webkit-full-screen .player-bar button{font-size:28px;padding:10px}
+
+    /* Stream label */
     .stream-label{position:absolute;top:10px;left:10px;background:rgba(22,163,74,0.9);color:#fff;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;z-index:10;transition:opacity 0.4s ease;pointer-events:none}
     .stream-label.error{background:rgba(225,29,72,0.9)}
     .stream-label.hidden{opacity:0}
 
-    /* Back button (top-right) — fades out */
+    /* Back button */
     .back-btn{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.6);border:none;color:#fff;font-size:18px;padding:6px 12px;border-radius:8px;cursor:pointer;z-index:10;transition:opacity 0.4s ease}
     .back-btn.hidden{opacity:0;pointer-events:none}
 
-    /* Player bar (bottom controls) — fades out */
+    /* Player bar */
     .player-bar{position:absolute;bottom:0;left:0;right:0;padding:10px 14px;background:linear-gradient(transparent,rgba(0,0,0,0.85));display:flex;align-items:center;gap:12px;z-index:10;transition:opacity 0.4s ease}
     .player-bar.hidden{opacity:0;pointer-events:none}
-    .player-bar button{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:6px;border-radius:8px;-webkit-tap-highlight-color:transparent}
+    .player-bar button{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:6px;border-radius:8px;-webkit-tap-highlight-color:transparent;line-height:1}
     .player-bar button:active{background:rgba(255,255,255,0.15)}
     .player-bar .spacer{flex:1}
 
-    /* Center play button overlay */
+    /* SVG icon for fullscreen */
+    .fs-icon{width:22px;height:22px;fill:#fff;vertical-align:middle}
+    .player-bar button .fs-icon{width:24px;height:24px}
+
+    /* Center play button */
     .center-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;background:rgba(0,0,0,0.6);border:2px solid rgba(255,255,255,0.8);border-radius:50%;display:none;align-items:center;justify-content:center;z-index:10;transition:opacity 0.4s ease}
     .center-play.show{display:flex}
     .center-play.hidden{opacity:0;pointer-events:none}
@@ -52,15 +70,8 @@
     .loading-overlay .spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    /* Touch overlay — invisible, captures taps */
+    /* Touch overlay */
     .touch-overlay{position:absolute;top:0;left:0;right:0;bottom:0;z-index:6}
-
-    /* Fullscreen styles */
-    :fullscreen,.player-container:fullscreen{width:100vw;height:100vh;aspect-ratio:auto}
-    :-webkit-full-screen,.player-container:-webkit-full-screen{width:100vw;height:100vh;aspect-ratio:auto}
-    :fullscreen video,:-webkit-full-screen video{height:100vh}
-    :fullscreen .player-bar,:-webkit-full-screen .player-bar{padding:16px 20px}
-    :fullscreen .player-bar button,:-webkit-full-screen .player-bar button{font-size:28px;padding:10px}
 
     /* Content */
     .content{padding:16px}
@@ -85,6 +96,10 @@
     .server-card:active{background:var(--card-hover);transform:scale(0.98)}
     .server-card .label{font-size:15px;font-weight:600}
     .server-card .sub{font-size:12px;color:var(--text-dim);margin-top:4px}
+
+    /* Iframe fallback player */
+    .iframe-player{display:none;width:100%;aspect-ratio:16/9;border:none;background:#000}
+    .iframe-player.show{display:block}
   </style>
 </head>
 <body>
@@ -93,9 +108,10 @@
     <div class="tabs" id="tabs"></div>
   </div>
 
+  <!-- HLS Player -->
   <div class="player-container" id="playerHls">
     <div class="stream-label" id="streamLabel">CONNECTING</div>
-    <video id="video" playsinline autoplay muted></video>
+    <video id="video" playsinline webkit-playsinline autoplay muted></video>
     <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
     <div class="touch-overlay" id="touchOverlay"></div>
     <div class="center-play" id="centerPlay" onclick="togglePlay()"></div>
@@ -103,9 +119,20 @@
       <button id="btnPlayPause" onclick="togglePlay()">⏸</button>
       <button id="btnMute" onclick="toggleMute()">🔇</button>
       <div class="spacer"></div>
-      <button onclick="goFullscreen()">⛶</button>
+      <button id="btnFullscreen" onclick="goFullscreen()">
+        <svg class="fs-icon" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      </button>
     </div>
     <button class="back-btn" id="backBtn" onclick="closePlayer()">✕</button>
+  </div>
+
+  <!-- Iframe fallback player (for streams that can't extract m3u8) -->
+  <div id="iframePlayerWrap" style="display:none;position:relative">
+    <iframe id="iframePlayer" class="iframe-player show" allowfullscreen allow="autoplay; fullscreen; picture-in-picture; encrypted-media" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"></iframe>
+    <button style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.6);border:none;color:#fff;font-size:18px;padding:6px 12px;border-radius:8px;cursor:pointer;z-index:10" onclick="closeIframePlayer()">✕</button>
+    <button id="btnIframeFs" style="position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.6);border:none;color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer;z-index:10" onclick="goIframeFullscreen()">
+      <svg class="fs-icon" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+    </button>
   </div>
 
   <div class="content" id="content">
@@ -117,6 +144,7 @@
     let currentSport='football',hls=null,sports=[],sportSource={};
     let controlsTimer=null,controlsVisible=true;
     let isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+    let isAndroid=/Android/i.test(navigator.userAgent);
 
     // ─── Init ──────────────────────────────────────────────────────
     async function init(){
@@ -138,7 +166,7 @@
     }
 
     function switchSport(key){
-      currentSport=key;renderTabs();closePlayer();loadListings(key);
+      currentSport=key;renderTabs();closePlayer();closeIframePlayer();loadListings(key);
     }
 
     // ─── Listings ──────────────────────────────────────────────────
@@ -200,7 +228,7 @@
           <div class="section-title">${escHtml(matchName)} — ${streams.length} provider</div>
           <div class="stream-list">
             ${streams.map((s,i)=>`
-              <div class="stream-card" onclick="playM3u8FromUrl('${escAttr(s.url)}')">
+              <div class="stream-card" onclick="playStream('${escAttr(s.url)}','${escAttr(s.name)}')">
                 <div class="server-dot"></div>
                 <div class="server-name">${escHtml(s.name)}</div>
                 <div class="server-channel">${escHtml(s.channel||'')}</div>
@@ -213,7 +241,87 @@
       }
     }
 
-    // ─── Play m3u8 ──────────────────────────────────────────────────
+    // ─── Play stream (tries m3u8 first, falls back to iframe) ─────
+    async function playStream(providerUrl, name){
+      showPlayer();
+      setLabel('CONNECTING...');
+      showLoading(true);
+      try{
+        const ctrl=new AbortController();
+        const timeout=setTimeout(()=>ctrl.abort(),30000);
+        const res=await fetch(`${API}/api/m3u8?url=${encodeURIComponent(providerUrl)}`,{signal:ctrl.signal});
+        clearTimeout(timeout);
+        const data=await res.json();
+        if(data.url){
+          playM3u8(data.url);
+        }else{
+          // Fallback: try iframe embed
+          showLoading(false);
+          closePlayer();
+          playIframeFallback(providerUrl);
+        }
+      }catch{
+        // On error, try iframe fallback
+        showLoading(false);
+        closePlayer();
+        playIframeFallback(providerUrl);
+      }
+    }
+
+    // ─── Iframe fallback ───────────────────────────────────────────
+    function playIframeFallback(url){
+      const wrap=document.getElementById('iframePlayerWrap');
+      const iframe=document.getElementById('iframePlayer');
+      wrap.style.display='block';
+      iframe.src=url;
+      wrap.scrollIntoView({behavior:'smooth'});
+    }
+
+    function closeIframePlayer(){
+      const wrap=document.getElementById('iframePlayerWrap');
+      const iframe=document.getElementById('iframePlayer');
+      wrap.style.display='none';
+      iframe.src='about:blank';
+    }
+
+    function goIframeFullscreen(){
+      const iframe=document.getElementById('iframePlayer');
+      try{
+        if(iframe.requestFullscreen) iframe.requestFullscreen();
+        else if(iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
+        else if(iframe.mozRequestFullScreen) iframe.mozRequestFullScreen();
+        else if(iframe.msRequestFullscreen) iframe.msRequestFullscreen();
+      }catch(e){console.warn('iframe fullscreen failed',e)}
+      // Try to request fullscreen on parent wrapper too
+      if(isIOS){
+        // iOS: try native video inside iframe (limited)
+        try{iframe.webkitRequestFullscreen();}catch{}
+      }
+    }
+
+    // ─── Player show/hide ──────────────────────────────────────────
+    function showPlayer(){
+      closeIframePlayer();
+      const el=document.getElementById('playerHls');
+      el.classList.add('show');
+      el.scrollIntoView({behavior:'smooth'});
+      resetControlsTimer();
+    }
+
+    function setLabel(text,isError){
+      const el=document.getElementById('streamLabel');
+      el.textContent=text;
+      el.className=isError?'stream-label error':'stream-label';
+      if(text==='● LIVE'){
+        setTimeout(()=>{if(controlsVisible) el.classList.add('hidden');},4000);
+      }
+    }
+
+    function showLoading(show){
+      document.getElementById('loadingOverlay').classList.toggle('show',show);
+    }
+
+    // ─── Play m3u8 from API (called by NontonX) ──────────────────
     async function playM3u8FromUrl(url){
       showPlayer();
       setLabel('CONNECTING...');
@@ -227,27 +335,6 @@
         if(data.url) playM3u8(data.url);
         else{setLabel('NO STREAM',true);showLoading(false);}
       }catch{setLabel('ERROR',true);showLoading(false);}
-    }
-
-    function showPlayer(){
-      const el=document.getElementById('playerHls');
-      el.classList.add('show');
-      el.scrollIntoView({behavior:'smooth'});
-      resetControlsTimer();
-    }
-
-    function setLabel(text,isError){
-      const el=document.getElementById('streamLabel');
-      el.textContent=text;
-      el.className=isError?'stream-label error':'stream-label';
-      // Auto-hide label after 4s if LIVE
-      if(text==='● LIVE'){
-        setTimeout(()=>{if(controlsVisible) el.classList.add('hidden');},4000);
-      }
-    }
-
-    function showLoading(show){
-      document.getElementById('loadingOverlay').classList.toggle('show',show);
     }
 
     // ─── HLS Player ────────────────────────────────────────────────
@@ -272,6 +359,8 @@
           video.play().catch(()=>{});
           setLabel('● LIVE');
           showLoading(false);
+          // Auto-unmute after user gesture detection
+          autoUnmute();
         });
         hls.on(Hls.Events.ERROR,(_,data)=>{
           if(data.fatal){
@@ -284,7 +373,6 @@
             }
           }
         });
-        // Fallback: hide loading after 10s even if MANIFEST_PARSED didn't fire
         setTimeout(()=>{showLoading(false);},10000);
       }else if(video.canPlayType('application/vnd.apple.mpegurl')){
         video.src=url;
@@ -292,6 +380,7 @@
           video.play().catch(()=>{});
           setLabel('● LIVE');
           showLoading(false);
+          autoUnmute();
         });
         video.addEventListener('error',()=>{setLabel('STREAM ERROR',true);showLoading(false);});
         setTimeout(()=>{showLoading(false);},10000);
@@ -300,6 +389,19 @@
         showLoading(false);
       }
     }
+
+    // Auto-unmute: detect first user interaction, then unmute
+    let hasUserGesture=false;
+    function autoUnmute(){
+      if(hasUserGesture){
+        const v=document.getElementById('video');
+        v.muted=false;
+        document.getElementById('btnMute').textContent='🔊';
+      }
+    }
+    ['click','touchstart','touchend'].forEach(evt=>{
+      document.addEventListener(evt,()=>{hasUserGesture=true;},{once:false,passive:true});
+    });
 
     // ─── Controls ──────────────────────────────────────────────────
     function togglePlay(){
@@ -318,33 +420,70 @@
       resetControlsTimer();
     }
 
-    // ─── Fullscreen (iOS + Android + Desktop) ──────────────────────
+    // ─── Fullscreen (robust mobile + desktop) ─────────────────────
     function goFullscreen(){
       const container=document.getElementById('playerHls');
       const video=document.getElementById('video');
 
       if(isIOS){
-        // iOS Safari: fullscreen only works on <video>
-        if(video.webkitEnterFullscreen) video.webkitEnterFullscreen();
-        else if(video.webkitSupportsFullscreen&&video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+        // iOS Safari: only <video> supports native fullscreen
+        try{
+          if(video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+          else if(video.webkitSupportsFullscreen) video.webkitEnterFullscreen();
+        }catch(e){
+          console.warn('iOS fullscreen failed',e);
+          // Fallback: try webkit on container
+          try{container.webkitEnterFullscreen();}catch{}
+        }
+      }else if(isAndroid){
+        // Android: requestFullscreen on video element is most reliable
+        try{
+          if(video.requestFullscreen) video.requestFullscreen();
+          else if(video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+          else if(video.mozRequestFullScreen) video.mozRequestFullScreen();
+          else if(container.requestFullscreen) container.requestFullscreen();
+          else if(container.webkitRequestFullscreen) container.webkitRequestFullscreen();
+        }catch(e){
+          console.warn('Android fullscreen failed',e);
+        }
+        // Try to lock to landscape on mobile
+        try{
+          if(screen.orientation && screen.orientation.lock){
+            screen.orientation.lock('landscape').catch(()=>{});
+          }
+        }catch{}
       }else{
-        // Android + Desktop
-        if(container.requestFullscreen) container.requestFullscreen();
-        else if(container.webkitRequestFullscreen) container.webkitRequestFullscreen();
-        else if(container.mozRequestFullScreen) container.mozRequestFullScreen();
-        else if(video.requestFullscreen) video.requestFullscreen();
-        else if(video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+        // Desktop
+        const el = container.requestFullscreen ? container :
+                    container.webkitRequestFullscreen ? container :
+                    video;
+        try{
+          if(el.requestFullscreen) el.requestFullscreen();
+          else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+          else if(el.mozRequestFullScreen) el.mozRequestFullScreen();
+          else if(el.msRequestFullscreen) el.msRequestFullscreen();
+        }catch(e){console.warn('Desktop fullscreen failed',e)}
       }
-      // In fullscreen, still hide controls after timeout
       resetControlsTimer();
     }
 
-    // Listen for fullscreen changes
+    // Fullscreen change handler — update icon
     document.addEventListener('fullscreenchange',onFullscreenChange);
     document.addEventListener('webkitfullscreenchange',onFullscreenChange);
     function onFullscreenChange(){
       const isFS=!!(document.fullscreenElement||document.webkitFullscreenElement);
-      // Could adjust UI if needed
+      const btn=document.getElementById('btnFullscreen');
+      if(isFS){
+        // Show exit-fullscreen icon
+        btn.innerHTML='<svg class="fs-icon" viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>';
+      }else{
+        // Show enter-fullscreen icon
+        btn.innerHTML='<svg class="fs-icon" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>';
+      }
+      // Unlock orientation when exiting fullscreen
+      if(!isFS){
+        try{if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock();}catch{}
+      }
     }
 
     // ─── Controls visibility (auto-hide) ───────────────────────────
@@ -370,22 +509,17 @@
       if(controlsTimer) clearTimeout(controlsTimer);
       controlsTimer=setTimeout(()=>{
         const v=document.getElementById('video');
-        // Only hide if video is playing
         if(v&&!v.paused&&!v.ended) hideControls();
       },3000);
     }
 
-    // Tap video area to toggle controls
+    // Tap to toggle controls
     document.getElementById('touchOverlay').addEventListener('click',()=>{
       if(controlsVisible) hideControls();
       else showControls();
     });
 
-    // Also show controls on any player interaction
     document.getElementById('playerHls').addEventListener('mousemove',showControls);
-    document.getElementById('playerHls').addEventListener('touchstart',()=>{
-      // Don't auto-show on every touch, only on the overlay tap
-    });
 
     // Double-tap for fullscreen
     let lastTap=0;
@@ -402,6 +536,11 @@
       const v=document.getElementById('video');v.pause();v.src='';
       if(controlsTimer) clearTimeout(controlsTimer);
       showLoading(false);
+      // Exit fullscreen if active
+      try{
+        if(document.fullscreenElement) document.exitFullscreen();
+        else if(document.webkitFullscreenElement) document.webkitExitFullscreen();
+      }catch{}
     }
 
     // ─── Utils ─────────────────────────────────────────────────────
