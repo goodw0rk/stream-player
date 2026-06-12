@@ -6,320 +6,104 @@
   <title>Live Stream</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <style>
-    :root {
-      --bg: #0a0a0a;
-      --card: #161616;
-      --card-hover: #1e1e1e;
-      --accent: #e11d48;
-      --accent-glow: rgba(225, 29, 72, 0.3);
-      --green: #16a34a;
-      --text: #f0f0f0;
-      --text-dim: #888;
-      --border: #2a2a2a;
-      --radius: 14px;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', sans-serif;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
+    :root { --bg:#0a0a0a;--card:#161616;--card-hover:#1e1e1e;--accent:#e11d48;--accent-glow:rgba(225,29,72,0.3);--green:#16a34a;--text:#f0f0f0;--text-dim:#888;--border:#2a2a2a;--radius:14px; }
+    * { margin:0;padding:0;box-sizing:border-box; }
+    body { background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'SF Pro',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased; }
+    .topbar { position:sticky;top:0;z-index:100;background:rgba(10,10,10,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:12px 16px 0;border-bottom:1px solid var(--border); }
+    .topbar h1 { font-size:20px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px; }
+    .topbar h1 .dot { width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .tabs { display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:12px;-webkit-overflow-scrolling:touch; }
+    .tabs::-webkit-scrollbar { display:none; }
+    .tab { flex-shrink:0;padding:8px 16px;border-radius:20px;background:var(--card);border:1px solid var(--border);color:var(--text-dim);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;-webkit-tap-highlight-color:transparent; }
+    .tab.active { background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 0 20px var(--accent-glow); }
+    .tab:not(.active):active { background:var(--card-hover); }
 
-    /* ─── Top bar ─── */
-    .topbar {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(10,10,10,0.92);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      padding: 12px 16px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .topbar h1 {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .topbar h1 .dot {
-      width: 8px; height: 8px;
-      background: var(--green);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
+    /* Player area */
+    .player-container { display:none;position:relative;background:#000;width:100%;aspect-ratio:16/9; }
+    .player-container.show { display:block; }
+    .player-container video { width:100%;height:100%;display:block;object-fit:contain;background:#000; }
+    .player-container iframe { width:100%;height:100%;border:none;display:block; }
+    .player-bar { position:absolute;bottom:0;left:0;right:0;padding:10px 14px;background:linear-gradient(transparent,rgba(0,0,0,0.85));display:flex;align-items:center;gap:12px;z-index:5; }
+    .player-bar button { background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:6px;border-radius:8px;-webkit-tap-highlight-color:transparent; }
+    .player-bar button:active { background:rgba(255,255,255,0.15); }
+    .player-bar .spacer { flex:1; }
+    .stream-label { position:absolute;top:10px;left:10px;background:rgba(22,163,74,0.9);color:#fff;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;z-index:5; }
+    .stream-label.error { background:rgba(225,29,72,0.9); }
+    .back-btn { position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.6);border:none;color:#fff;font-size:18px;padding:6px 12px;border-radius:8px;cursor:pointer;z-index:5; }
 
-    /* ─── Sport tabs ─── */
-    .tabs {
-      display: flex;
-      gap: 6px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      padding-bottom: 12px;
-      -webkit-overflow-scrolling: touch;
-    }
-    .tabs::-webkit-scrollbar { display: none; }
-    .tab {
-      flex-shrink: 0;
-      padding: 8px 16px;
-      border-radius: 20px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      color: var(--text-dim);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      white-space: nowrap;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .tab.active {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
-    .tab:not(.active):active {
-      background: var(--card-hover);
-    }
-
-    /* ─── Player ─── */
-    .player-container {
-      display: none;
-      position: relative;
-      background: #000;
-      width: 100%;
-      aspect-ratio: 16/9;
-    }
-    .player-container.show { display: block; }
-    .player-container video {
-      width: 100%; height: 100%;
-      display: block;
-      object-fit: contain;
-      background: #000;
-    }
-    .player-bar {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      padding: 10px 14px;
-      background: linear-gradient(transparent, rgba(0,0,0,0.85));
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .player-bar button {
-      background: none; border: none;
-      color: #fff; font-size: 22px;
-      cursor: pointer; padding: 6px;
-      border-radius: 8px;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .player-bar button:active { background: rgba(255,255,255,0.15); }
-    .player-bar .spacer { flex: 1; }
-    .stream-label {
-      position: absolute;
-      top: 10px; left: 10px;
-      background: rgba(22,163,74,0.9);
-      color: #fff;
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-    .stream-label.error { background: rgba(225,29,72,0.9); }
-    .back-btn {
-      position: absolute;
-      top: 10px; right: 10px;
-      background: rgba(0,0,0,0.6);
-      border: none; color: #fff;
-      font-size: 18px;
-      padding: 6px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    /* ─── Content area ─── */
-    .content {
-      padding: 16px;
-    }
-    .section-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 10px;
-    }
-
-    /* ─── Event cards ─── */
-    .event-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .event-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px 16px;
-      cursor: pointer;
-      transition: all 0.15s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .event-card:active {
-      background: var(--card-hover);
-      transform: scale(0.98);
-    }
-    .event-name {
-      font-size: 15px;
-      font-weight: 600;
-    }
-
-    /* ─── Stream list ─── */
-    .stream-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .stream-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 16px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: all 0.15s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .stream-card:active {
-      background: var(--card-hover);
-      transform: scale(0.98);
-    }
-    .stream-card .server-dot {
-      width: 8px; height: 8px;
-      background: var(--green);
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .stream-card .server-name {
-      font-size: 14px;
-      font-weight: 500;
-    }
-    .stream-card .server-arrow {
-      margin-left: auto;
-      color: var(--text-dim);
-      font-size: 16px;
-    }
-
-    /* ─── Back nav ─── */
-    .nav-back {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--text-dim);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-bottom: 12px;
-      padding: 6px 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .nav-back:active { color: var(--text); }
-
-    /* ─── Loading ─── */
-    .loading {
-      text-align: center;
-      padding: 40px 0;
-      color: var(--text-dim);
-    }
-    .loading .spinner {
-      width: 24px; height: 24px;
-      border: 3px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 12px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .empty {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--text-dim);
-      font-size: 14px;
-    }
-
-    /* ─── Fullscreen tweaks ─── */
-    :fullscreen .player-bar,
-    :-webkit-full-screen .player-bar {
-      padding: 16px 20px;
-    }
-    :fullscreen .player-bar button,
-    :-webkit-full-screen .player-bar button {
-      font-size: 28px;
-      padding: 10px;
-    }
+    .content { padding:16px; }
+    .section-title { font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px; }
+    .event-list,.stream-list { display:flex;flex-direction:column;gap:8px; }
+    .event-card,.stream-card { background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;cursor:pointer;transition:all 0.15s;-webkit-tap-highlight-color:transparent; }
+    .event-card:active,.stream-card:active { background:var(--card-hover);transform:scale(0.98); }
+    .event-name,.server-name { font-size:15px;font-weight:600; }
+    .stream-card { display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px; }
+    .stream-card .server-dot { width:8px;height:8px;background:var(--green);border-radius:50%;flex-shrink:0; }
+    .stream-card .server-arrow { margin-left:auto;color:var(--text-dim);font-size:16px; }
+    .nav-back { display:inline-flex;align-items:center;gap:6px;color:var(--text-dim);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:12px;padding:6px 0;-webkit-tap-highlight-color:transparent; }
+    .nav-back:active { color:var(--text); }
+    .loading { text-align:center;padding:40px 0;color:var(--text-dim); }
+    .loading .spinner { width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .empty { text-align:center;padding:40px 20px;color:var(--text-dim);font-size:14px; }
+    .server-card { background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all 0.15s;-webkit-tap-highlight-color:transparent; }
+    .server-card:active { background:var(--card-hover);transform:scale(0.98); }
+    .server-card .label { font-size:15px;font-weight:600; }
+    .server-card .sub { font-size:12px;color:var(--text-dim);margin-top:4px; }
+    .iframe-hint { background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;text-align:center;color:var(--text-dim);font-size:13px;margin-bottom:8px; }
+    .iframe-hint a { color:var(--accent);text-decoration:none; }
+    :fullscreen .player-bar, :-webkit-full-screen .player-bar { padding:16px 20px; }
+    :fullscreen .player-bar button, :-webkit-full-screen .player-bar button { font-size:28px;padding:10px; }
   </style>
 </head>
 <body>
-
-  <!-- Top bar -->
   <div class="topbar">
     <h1><span class="dot"></span> Live Stream</h1>
     <div class="tabs" id="tabs"></div>
   </div>
 
-  <!-- Player -->
-  <div class="player-container" id="playerContainer">
+  <!-- Player: HLS.js mode -->
+  <div class="player-container" id="playerHls">
     <div class="stream-label" id="streamLabel">CONNECTING</div>
     <video id="video" playsinline autoplay muted></video>
     <div class="player-bar">
       <button id="btnPlayPause" onclick="togglePlay()">⏸</button>
       <button onclick="toggleMute()">🔊</button>
       <div class="spacer"></div>
-      <button onclick="goFullscreen()">⛶</button>
+      <button onclick="goFullscreen('playerHls')">⛶</button>
     </div>
     <button class="back-btn" onclick="closePlayer()">✕</button>
   </div>
 
-  <!-- Content -->
+  <!-- Player: iframe embed mode (for LiveTV football) -->
+  <div class="player-container" id="playerIframe">
+    <iframe id="embedFrame" allowfullscreen allow="autoplay; fullscreen"></iframe>
+    <button class="back-btn" onclick="closePlayer()" style="z-index:10">✕</button>
+  </div>
+
   <div class="content" id="content">
-    <div class="loading" id="loader">
-      <div class="spinner"></div>
-      Loading...
-    </div>
+    <div class="loading"><div class="spinner"></div>Loading...</div>
   </div>
 
   <script>
     const API = '';
-    let currentSport = 'football';
+    let currentSport = 'motogp';
     let hls = null;
     let sports = [];
+    let sportSource = {};
 
-    // ─── Init ───────────────────────────────────────────────────────
     async function init() {
       const res = await fetch(`${API}/api/sports`);
       sports = await res.json();
+      sports.forEach(s => sportSource[s.key] = s.source);
       renderTabs();
-      loadEvents(currentSport);
+      loadListings(currentSport);
     }
 
-    // ─── Tabs ───────────────────────────────────────────────────────
     function renderTabs() {
-      const el = document.getElementById('tabs');
-      el.innerHTML = sports.map(s =>
-        `<div class="tab ${s.key === currentSport ? 'active' : ''}"
-              onclick="switchSport('${s.key}')">${s.label}</div>`
+      document.getElementById('tabs').innerHTML = sports.map(s =>
+        `<div class="tab ${s.key===currentSport?'active':''}" onclick="switchSport('${s.key}')">${s.label}</div>`
       ).join('');
     }
 
@@ -327,203 +111,175 @@
       currentSport = key;
       renderTabs();
       closePlayer();
-      loadEvents(key);
+      loadListings(key);
     }
 
-    // ─── Events ─────────────────────────────────────────────────────
-    async function loadEvents(sport) {
+    async function loadListings(sport) {
       const content = document.getElementById('content');
-      content.innerHTML = '<div class="loading"><div class="spinner"></div>Loading events...</div>';
-
+      content.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
       try {
         const res = await fetch(`${API}/api/listings/${sport}`);
-        const events = await res.json();
-
-        if (!events.length) {
-          content.innerHTML = '<div class="empty">No events found for this sport right now.</div>';
-          return;
-        }
-
-        content.innerHTML = `
-          <div class="section-title">Upcoming / Live</div>
-          <div class="event-list">
-            ${events.map((e, i) => `
-              <div class="event-card" onclick='loadStreams(${JSON.stringify(e.url)}, ${JSON.stringify(e.name)})'>
-                <div class="event-name">${escHtml(e.name)}</div>
-              </div>
-            `).join('')}
-          </div>
-        `;
-      } catch (err) {
-        content.innerHTML = '<div class="empty">Failed to load events. Try again.</div>';
-      }
+        const data = await res.json();
+        if (!data.length) { content.innerHTML = '<div class="empty">No streams available right now.</div>'; return; }
+        if (sportSource[sport] === 'nontonx') renderNontonXServers(data, sport);
+        else renderLiveTVEvents(data);
+      } catch { content.innerHTML = '<div class="empty">Failed to load. Try again.</div>'; }
     }
 
-    // ─── Streams ────────────────────────────────────────────────────
+    // ─── NontonX servers ────────────────────────────────────────────
+    function renderNontonXServers(servers, sport) {
+      const label = sports.find(s => s.key===sport)?.label || sport;
+      document.getElementById('content').innerHTML = `
+        <div class="section-title">${label} — ${servers.length} servers</div>
+        <div class="event-list">
+          ${servers.map(s => `
+            <div class="server-card" onclick="playNontonX('${escAttr(s.url)}','${escAttr(s.name)}')">
+              <div class="label">${escHtml(s.name)}</div>
+              <div class="sub">Tap to play</div>
+            </div>
+          `).join('')}
+        </div>`;
+    }
+
+    async function playNontonX(url, label) {
+      showHlsPlayer(); setLabel('CONNECTING...');
+      try {
+        const res = await fetch(`${API}/api/m3u8?url=${encodeURIComponent(url)}`);
+        const data = await res.json();
+        if (data.url) playM3u8(data.url);
+        else setLabel('NO STREAM', true);
+      } catch { setLabel('ERROR', true); }
+    }
+
+    // ─── LiveTV events ──────────────────────────────────────────────
+    function renderLiveTVEvents(events) {
+      document.getElementById('content').innerHTML = `
+        <div class="section-title">Upcoming / Live</div>
+        <div class="event-list">
+          ${events.map(e => `
+            <div class="event-card" onclick='loadStreams(${JSON.stringify(e.url)},${JSON.stringify(e.name)})'>
+              <div class="event-name">${escHtml(e.name)}</div>
+            </div>
+          `).join('')}
+        </div>`;
+    }
+
     async function loadStreams(eventUrl, eventName) {
       const content = document.getElementById('content');
       content.innerHTML = `
-        <div class="nav-back" onclick="loadEvents(currentSport)">← Back to events</div>
+        <div class="nav-back" onclick="loadListings(currentSport)">← Back</div>
         <div class="section-title">${escHtml(eventName)}</div>
-        <div class="loading"><div class="spinner"></div>Finding streams...</div>
-      `;
-
+        <div class="loading"><div class="spinner"></div>Finding streams...</div>`;
       try {
         const res = await fetch(`${API}/api/streams?url=${encodeURIComponent(eventUrl)}`);
         const streams = await res.json();
-
         if (!streams.length) {
-          content.innerHTML = `
-            <div class="nav-back" onclick="loadEvents(currentSport)">← Back to events</div>
-            <div class="section-title">${escHtml(eventName)}</div>
-            <div class="empty">No streams available yet for this event.</div>
-          `;
+          content.innerHTML = `<div class="nav-back" onclick="loadListings(currentSport)">← Back</div>
+            <div class="section-title">${escHtml(eventName)}</div><div class="empty">No streams available yet.</div>`;
           return;
         }
-
         content.innerHTML = `
-          <div class="nav-back" onclick="loadEvents(currentSport)">← Back to events</div>
+          <div class="nav-back" onclick="loadListings(currentSport)">← Back</div>
           <div class="section-title">${escHtml(eventName)} — ${streams.length} streams</div>
+          <div class="iframe-hint">📺 Tap a server to watch. Opens in embedded player.</div>
           <div class="stream-list">
-            ${streams.map((s, i) => `
-              <div class="stream-card" onclick='playStream(${JSON.stringify(s.url)}, "Server ${i+1}")'>
-                <div class="server-dot"></div>
-                <div class="server-name">${escHtml(s.text || 'Server ' + (i+1))}</div>
-                <div class="server-arrow">›</div>
-              </div>
-            `).join('')}
-          </div>
-        `;
-      } catch (err) {
-        content.innerHTML = `
-          <div class="nav-back" onclick="loadEvents(currentSport)">← Back to events</div>
-          <div class="empty">Failed to load streams.</div>
-        `;
+            ${streams.map((s, i) => {
+              if (s.type === 'iframe' && s.embedUrl) {
+                return `<div class="stream-card" onclick="playIframe('${escAttr(s.embedUrl)}')">
+                  <div class="server-dot"></div>
+                  <div class="server-name">${escHtml(s.text || 'Server '+(i+1))}</div>
+                  <div class="server-arrow">›</div></div>`;
+              } else {
+                return `<div class="stream-card" onclick="playWebplayer('${escAttr(s.url)}')">
+                  <div class="server-dot"></div>
+                  <div class="server-name">${escHtml(s.text || 'Server '+(i+1))}</div>
+                  <div class="server-arrow">›</div></div>`;
+              }
+            }).join('')}
+          </div>`;
+      } catch {
+        content.innerHTML = `<div class="nav-back" onclick="loadListings(currentSport)">← Back</div>
+          <div class="empty">Failed to load streams.</div>`;
       }
     }
 
-    // ─── Play stream ────────────────────────────────────────────────
-    async function playStream(embedUrl, label) {
-      const container = document.getElementById('playerContainer');
-      const streamLabel = document.getElementById('streamLabel');
-      const video = document.getElementById('video');
-
+    // ─── Play via iframe embed ──────────────────────────────────────
+    function playIframe(embedUrl) {
+      closePlayer();
+      const container = document.getElementById('playerIframe');
+      const frame = document.getElementById('embedFrame');
+      frame.src = embedUrl;
       container.classList.add('show');
-      streamLabel.textContent = 'CONNECTING...';
-      streamLabel.className = 'stream-label';
       container.scrollIntoView({ behavior: 'smooth' });
+    }
 
-      // Extract m3u8
-      try {
-        const res = await fetch(`${API}/api/m3u8?url=${encodeURIComponent(embedUrl)}`);
-        const data = await res.json();
+    // ─── Play via webplayer iframe ──────────────────────────────────
+    function playWebplayer(webplayerUrl) {
+      closePlayer();
+      const container = document.getElementById('playerIframe');
+      const frame = document.getElementById('embedFrame');
+      frame.src = webplayerUrl;
+      container.classList.add('show');
+      container.scrollIntoView({ behavior: 'smooth' });
+    }
 
-        if (!data.url) {
-          streamLabel.textContent = 'NO STREAM';
-          streamLabel.className = 'stream-label error';
-          return;
-        }
+    // ─── HLS Player ─────────────────────────────────────────────────
+    function showHlsPlayer() {
+      closePlayer();
+      document.getElementById('playerHls').classList.add('show');
+      document.getElementById('playerHls').scrollIntoView({ behavior: 'smooth' });
+    }
 
-        playM3u8(data.url);
-      } catch (err) {
-        streamLabel.textContent = 'ERROR';
-        streamLabel.className = 'stream-label error';
-      }
+    function setLabel(text, isError) {
+      const el = document.getElementById('streamLabel');
+      el.textContent = text;
+      el.className = isError ? 'stream-label error' : 'stream-label';
     }
 
     function playM3u8(url) {
       const video = document.getElementById('video');
-      const streamLabel = document.getElementById('streamLabel');
-
       if (hls) { hls.destroy(); hls = null; }
-
       if (Hls.isSupported()) {
-        hls = new Hls({
-          maxBufferLength: 15,
-          maxMaxBufferLength: 30,
-          liveSyncDurationCount: 3,
-          enableWorker: true,
-          lowLatencyMode: true,
-        });
-        hls.loadSource(url);
-        hls.attachMedia(video);
-
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          video.play().catch(() => {});
-          streamLabel.textContent = '● LIVE';
-          streamLabel.className = 'stream-label';
-        });
-
+        hls = new Hls({ maxBufferLength:15, maxMaxBufferLength:30, liveSyncDurationCount:3, enableWorker:true, lowLatencyMode:true });
+        hls.loadSource(url); hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => { video.play().catch(()=>{}); setLabel('● LIVE'); });
         hls.on(Hls.Events.ERROR, (_, data) => {
           if (data.fatal) {
-            if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-              streamLabel.textContent = 'RECONNECTING...';
-              setTimeout(() => hls.startLoad(), 2000);
-            } else {
-              streamLabel.textContent = 'STREAM ERROR';
-              streamLabel.className = 'stream-label error';
-            }
+            if (data.type === Hls.ErrorTypes.NETWORK_ERROR) { setLabel('RECONNECTING...'); setTimeout(() => hls.startLoad(), 2000); }
+            else setLabel('STREAM ERROR', true);
           }
         });
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = url;
-        video.addEventListener('loadedmetadata', () => {
-          video.play().catch(() => {});
-          streamLabel.textContent = '● LIVE';
-          streamLabel.className = 'stream-label';
-        });
+        video.addEventListener('loadedmetadata', () => { video.play().catch(()=>{}); setLabel('● LIVE'); });
       }
     }
 
-    // ─── Player controls ────────────────────────────────────────────
     function togglePlay() {
-      const video = document.getElementById('video');
-      const btn = document.getElementById('btnPlayPause');
-      if (video.paused) {
-        video.play();
-        btn.textContent = '⏸';
-      } else {
-        video.pause();
-        btn.textContent = '▶';
-      }
+      const v = document.getElementById('video'), b = document.getElementById('btnPlayPause');
+      if (v.paused) { v.play(); b.textContent='⏸'; } else { v.pause(); b.textContent='▶'; }
     }
-
-    function toggleMute() {
-      const video = document.getElementById('video');
-      video.muted = !video.muted;
-    }
-
-    function goFullscreen() {
-      const el = document.getElementById('playerContainer');
+    function toggleMute() { document.getElementById('video').muted = !document.getElementById('video').muted; }
+    function goFullscreen(id) {
+      const el = document.getElementById(id);
       if (el.requestFullscreen) el.requestFullscreen();
       else if (el.webkitEnterFullscreen) el.webkitEnterFullscreen();
       else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
     }
-
     function closePlayer() {
-      const container = document.getElementById('playerContainer');
-      container.classList.remove('show');
+      ['playerHls','playerIframe'].forEach(id => document.getElementById(id).classList.remove('show'));
       if (hls) { hls.destroy(); hls = null; }
-      const video = document.getElementById('video');
-      video.pause();
-      video.src = '';
+      const v = document.getElementById('video'); v.pause(); v.src = '';
+      document.getElementById('embedFrame').src = '';
     }
 
-    // ─── Helpers ────────────────────────────────────────────────────
-    function escHtml(str) {
-      const d = document.createElement('div');
-      d.textContent = str;
-      return d.innerHTML;
-    }
+    function escHtml(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+    function escAttr(s) { return s.replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
 
-    // Double-tap fullscreen
     let lastTap = 0;
-    document.getElementById('playerContainer').addEventListener('touchend', (e) => {
+    document.getElementById('playerHls').addEventListener('touchend', e => {
       const now = Date.now();
-      if (now - lastTap < 300) {
-        e.preventDefault();
-        goFullscreen();
-      }
+      if (now - lastTap < 300) { e.preventDefault(); goFullscreen('playerHls'); }
       lastTap = now;
     });
 
