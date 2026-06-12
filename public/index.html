@@ -18,16 +18,51 @@
     .tab{flex-shrink:0;padding:8px 16px;border-radius:20px;background:var(--card);border:1px solid var(--border);color:var(--text-dim);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap;-webkit-tap-highlight-color:transparent}
     .tab.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 0 20px var(--accent-glow)}
     .tab:not(.active):active{background:var(--card-hover)}
-    .player-container{display:none;position:relative;background:#000;width:100%;aspect-ratio:16/9}
+
+    /* Player */
+    .player-container{display:none;position:relative;background:#000;width:100%;aspect-ratio:16/9;overflow:hidden}
     .player-container.show{display:block}
     .player-container video{width:100%;height:100%;display:block;object-fit:contain;background:#000}
-    .player-bar{position:absolute;bottom:0;left:0;right:0;padding:10px 14px;background:linear-gradient(transparent,rgba(0,0,0,0.85));display:flex;align-items:center;gap:12px;z-index:5}
+
+    /* Stream label (top-left) — fades out */
+    .stream-label{position:absolute;top:10px;left:10px;background:rgba(22,163,74,0.9);color:#fff;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;z-index:10;transition:opacity 0.4s ease;pointer-events:none}
+    .stream-label.error{background:rgba(225,29,72,0.9)}
+    .stream-label.hidden{opacity:0}
+
+    /* Back button (top-right) — fades out */
+    .back-btn{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.6);border:none;color:#fff;font-size:18px;padding:6px 12px;border-radius:8px;cursor:pointer;z-index:10;transition:opacity 0.4s ease}
+    .back-btn.hidden{opacity:0;pointer-events:none}
+
+    /* Player bar (bottom controls) — fades out */
+    .player-bar{position:absolute;bottom:0;left:0;right:0;padding:10px 14px;background:linear-gradient(transparent,rgba(0,0,0,0.85));display:flex;align-items:center;gap:12px;z-index:10;transition:opacity 0.4s ease}
+    .player-bar.hidden{opacity:0;pointer-events:none}
     .player-bar button{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:6px;border-radius:8px;-webkit-tap-highlight-color:transparent}
     .player-bar button:active{background:rgba(255,255,255,0.15)}
     .player-bar .spacer{flex:1}
-    .stream-label{position:absolute;top:10px;left:10px;background:rgba(22,163,74,0.9);color:#fff;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;z-index:5}
-    .stream-label.error{background:rgba(225,29,72,0.9)}
-    .back-btn{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.6);border:none;color:#fff;font-size:18px;padding:6px 12px;border-radius:8px;cursor:pointer;z-index:5}
+
+    /* Center play button overlay */
+    .center-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;background:rgba(0,0,0,0.6);border:2px solid rgba(255,255,255,0.8);border-radius:50%;display:none;align-items:center;justify-content:center;z-index:10;transition:opacity 0.4s ease}
+    .center-play.show{display:flex}
+    .center-play.hidden{opacity:0;pointer-events:none}
+    .center-play::after{content:'';display:block;width:0;height:0;border-style:solid;border-width:12px 0 12px 22px;border-color:transparent transparent transparent #fff;margin-left:4px}
+
+    /* Loading overlay */
+    .loading-overlay{position:absolute;top:0;left:0;right:0;bottom:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:8}
+    .loading-overlay.show{display:flex}
+    .loading-overlay .spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* Touch overlay — invisible, captures taps */
+    .touch-overlay{position:absolute;top:0;left:0;right:0;bottom:0;z-index:6}
+
+    /* Fullscreen styles */
+    :fullscreen,.player-container:fullscreen{width:100vw;height:100vh;aspect-ratio:auto}
+    :-webkit-full-screen,.player-container:-webkit-full-screen{width:100vw;height:100vh;aspect-ratio:auto}
+    :fullscreen video,:-webkit-full-screen video{height:100vh}
+    :fullscreen .player-bar,:-webkit-full-screen .player-bar{padding:16px 20px}
+    :fullscreen .player-bar button,:-webkit-full-screen .player-bar button{font-size:28px;padding:10px}
+
+    /* Content */
     .content{padding:16px}
     .section-title{font-size:13px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
     .event-list,.stream-list{display:flex;flex-direction:column;gap:8px}
@@ -44,15 +79,12 @@
     .nav-back:active{color:var(--text)}
     .loading{text-align:center;padding:40px 0;color:var(--text-dim)}
     .loading .spinner{width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px}
-    @keyframes spin{to{transform:rotate(360deg)}}
     .empty{text-align:center;padding:40px 20px;color:var(--text-dim);font-size:14px}
     .live-badge{display:inline-block;background:var(--accent);color:#fff;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;margin-left:8px;vertical-align:middle}
     .server-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all 0.15s;-webkit-tap-highlight-color:transparent}
     .server-card:active{background:var(--card-hover);transform:scale(0.98)}
     .server-card .label{font-size:15px;font-weight:600}
     .server-card .sub{font-size:12px;color:var(--text-dim);margin-top:4px}
-    :fullscreen .player-bar, :-webkit-full-screen .player-bar{padding:16px 20px}
-    :fullscreen .player-bar button, :-webkit-full-screen .player-bar button{font-size:28px;padding:10px}
   </style>
 </head>
 <body>
@@ -64,13 +96,16 @@
   <div class="player-container" id="playerHls">
     <div class="stream-label" id="streamLabel">CONNECTING</div>
     <video id="video" playsinline autoplay muted></video>
-    <div class="player-bar">
+    <div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div></div>
+    <div class="touch-overlay" id="touchOverlay"></div>
+    <div class="center-play" id="centerPlay" onclick="togglePlay()"></div>
+    <div class="player-bar" id="playerBar">
       <button id="btnPlayPause" onclick="togglePlay()">⏸</button>
-      <button onclick="toggleMute()">🔊</button>
+      <button id="btnMute" onclick="toggleMute()">🔇</button>
       <div class="spacer"></div>
       <button onclick="goFullscreen()">⛶</button>
     </div>
-    <button class="back-btn" onclick="closePlayer()">✕</button>
+    <button class="back-btn" id="backBtn" onclick="closePlayer()">✕</button>
   </div>
 
   <div class="content" id="content">
@@ -79,14 +114,21 @@
 
   <script>
     const API='';
-    let currentSport='motogp',hls=null,sports=[],sportSource={};
+    let currentSport='football',hls=null,sports=[],sportSource={};
+    let controlsTimer=null,controlsVisible=true;
+    let isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 
+    // ─── Init ──────────────────────────────────────────────────────
     async function init(){
-      const res=await fetch(`${API}/api/sports`);
-      sports=await res.json();
-      sports.forEach(s=>sportSource[s.key]=s.source);
-      renderTabs();
-      loadListings(currentSport);
+      try{
+        const res=await fetch(`${API}/api/sports`);
+        sports=await res.json();
+        sports.forEach(s=>sportSource[s.key]=s.source);
+        renderTabs();
+        loadListings(currentSport);
+      }catch(e){
+        document.getElementById('content').innerHTML='<div class="empty">Server offline. Refresh halaman.</div>';
+      }
     }
 
     function renderTabs(){
@@ -99,41 +141,42 @@
       currentSport=key;renderTabs();closePlayer();loadListings(key);
     }
 
+    // ─── Listings ──────────────────────────────────────────────────
     async function loadListings(sport){
       const c=document.getElementById('content');
       c.innerHTML='<div class="loading"><div class="spinner"></div>Loading...</div>';
       try{
         const res=await fetch(`${API}/api/listings/${sport}`);
         const data=await res.json();
-        if(!data.length){c.innerHTML='<div class="empty">No streams available right now.</div>';return;}
+        if(!data.length){c.innerHTML='<div class="empty">Tidak ada stream tersedia.</div>';return;}
         if(sportSource[sport]==='nontonx') renderNontonXServers(data,sport);
         else if(sportSource[sport]==='footybitez') renderFootybitezMatches(data);
-      }catch{c.innerHTML='<div class="empty">Failed to load. Try again.</div>';}
+      }catch{c.innerHTML='<div class="empty">Gagal load. Coba lagi.</div>';}
     }
 
     // ─── NontonX ────────────────────────────────────────────────────
     function renderNontonXServers(servers,sport){
       const label=sports.find(s=>s.key===sport)?.label||sport;
       document.getElementById('content').innerHTML=`
-        <div class="section-title">${label} — ${servers.length} servers</div>
+        <div class="section-title">${label} — ${servers.length} server</div>
         <div class="event-list">
           ${servers.map(s=>`
             <div class="server-card" onclick="playM3u8FromUrl('${escAttr(s.url)}')">
               <div class="label">${escHtml(s.name)}</div>
-              <div class="sub">Tap to play</div>
+              <div class="sub">Tap untuk play</div>
             </div>`).join('')}
         </div>`;
     }
 
-    // ─── Footybitez matches ─────────────────────────────────────────
+    // ─── Footybitez ─────────────────────────────────────────────────
     function renderFootybitezMatches(matches){
       document.getElementById('content').innerHTML=`
-        <div class="section-title">⚽ Football — ${matches.length} matches</div>
+        <div class="section-title">⚽ Football — ${matches.length} match</div>
         <div class="event-list">
           ${matches.map(m=>`
             <div class="event-card" onclick='loadProviders(${JSON.stringify(m.url)},${JSON.stringify(m.name)})'>
               <div class="event-name">${escHtml(m.name)}${m.isLive?'<span class="live-badge">LIVE</span>':''}</div>
-              <div class="event-meta">${m.isLive?'Match in progress':'Upcoming'}</div>
+              <div class="event-meta">${m.isLive?'Sedang berlangsung':'Akan datang'}</div>
             </div>`).join('')}
         </div>`;
     }
@@ -141,20 +184,20 @@
     async function loadProviders(matchUrl,matchName){
       const c=document.getElementById('content');
       c.innerHTML=`
-        <div class="nav-back" onclick="loadListings(currentSport)">← Back</div>
+        <div class="nav-back" onclick="loadListings(currentSport)">← Kembali</div>
         <div class="section-title">${escHtml(matchName)}</div>
-        <div class="loading"><div class="spinner"></div>Finding streams...</div>`;
+        <div class="loading"><div class="spinner"></div>Mencari stream...</div>`;
       try{
         const res=await fetch(`${API}/api/streams?url=${encodeURIComponent(matchUrl)}`);
         const streams=await res.json();
         if(!streams.length){
-          c.innerHTML=`<div class="nav-back" onclick="loadListings(currentSport)">← Back</div>
-            <div class="section-title">${escHtml(matchName)}</div><div class="empty">No streams available yet.</div>`;
+          c.innerHTML=`<div class="nav-back" onclick="loadListings(currentSport)">← Kembali</div>
+            <div class="section-title">${escHtml(matchName)}</div><div class="empty">Belum ada stream.</div>`;
           return;
         }
         c.innerHTML=`
-          <div class="nav-back" onclick="loadListings(currentSport)">← Back</div>
-          <div class="section-title">${escHtml(matchName)} — ${streams.length} providers</div>
+          <div class="nav-back" onclick="loadListings(currentSport)">← Kembali</div>
+          <div class="section-title">${escHtml(matchName)} — ${streams.length} provider</div>
           <div class="stream-list">
             ${streams.map((s,i)=>`
               <div class="stream-card" onclick="playM3u8FromUrl('${escAttr(s.url)}')">
@@ -165,78 +208,205 @@
               </div>`).join('')}
           </div>`;
       }catch{
-        c.innerHTML=`<div class="nav-back" onclick="loadListings(currentSport)">← Back</div>
-          <div class="empty">Failed to load streams.</div>`;
+        c.innerHTML=`<div class="nav-back" onclick="loadListings(currentSport)">← Kembali</div>
+          <div class="empty">Gagal load stream.</div>`;
       }
     }
 
     // ─── Play m3u8 ──────────────────────────────────────────────────
     async function playM3u8FromUrl(url){
-      showPlayer();setLabel('CONNECTING...');
+      showPlayer();
+      setLabel('CONNECTING...');
+      showLoading(true);
       try{
-        const res=await fetch(`${API}/api/m3u8?url=${encodeURIComponent(url)}`);
+        const ctrl=new AbortController();
+        const timeout=setTimeout(()=>ctrl.abort(),30000);
+        const res=await fetch(`${API}/api/m3u8?url=${encodeURIComponent(url)}`,{signal:ctrl.signal});
+        clearTimeout(timeout);
         const data=await res.json();
         if(data.url) playM3u8(data.url);
-        else setLabel('NO STREAM',true);
-      }catch{setLabel('ERROR',true);}
+        else{setLabel('NO STREAM',true);showLoading(false);}
+      }catch{setLabel('ERROR',true);showLoading(false);}
     }
 
     function showPlayer(){
-      document.getElementById('playerHls').classList.add('show');
-      document.getElementById('playerHls').scrollIntoView({behavior:'smooth'});
+      const el=document.getElementById('playerHls');
+      el.classList.add('show');
+      el.scrollIntoView({behavior:'smooth'});
+      resetControlsTimer();
     }
 
     function setLabel(text,isError){
       const el=document.getElementById('streamLabel');
       el.textContent=text;
       el.className=isError?'stream-label error':'stream-label';
-    }
-
-    function playM3u8(url){
-      const video=document.getElementById('video');
-      if(hls){hls.destroy();hls=null;}
-      if(Hls.isSupported()){
-        hls=new Hls({maxBufferLength:15,maxMaxBufferLength:30,liveSyncDurationCount:3,enableWorker:true,lowLatencyMode:true});
-        hls.loadSource(url);hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED,()=>{video.play().catch(()=>{});setLabel('● LIVE');});
-        hls.on(Hls.Events.ERROR,(_,data)=>{
-          if(data.fatal){
-            if(data.type===Hls.ErrorTypes.NETWORK_ERROR){setLabel('RECONNECTING...');setTimeout(()=>hls.startLoad(),2000);}
-            else setLabel('STREAM ERROR',true);
-          }
-        });
-      }else if(video.canPlayType('application/vnd.apple.mpegurl')){
-        video.src=url;
-        video.addEventListener('loadedmetadata',()=>{video.play().catch(()=>{});setLabel('● LIVE');});
+      // Auto-hide label after 4s if LIVE
+      if(text==='● LIVE'){
+        setTimeout(()=>{if(controlsVisible) el.classList.add('hidden');},4000);
       }
     }
 
-    function togglePlay(){
-      const v=document.getElementById('video'),b=document.getElementById('btnPlayPause');
-      if(v.paused){v.play();b.textContent='⏸';}else{v.pause();b.textContent='▶';}
+    function showLoading(show){
+      document.getElementById('loadingOverlay').classList.toggle('show',show);
     }
-    function toggleMute(){document.getElementById('video').muted=!document.getElementById('video').muted;}
-    function goFullscreen(){
-      const el=document.getElementById('playerHls');
-      if(el.requestFullscreen)el.requestFullscreen();
-      else if(el.webkitEnterFullscreen)el.webkitEnterFullscreen();
-      else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();
-    }
-    function closePlayer(){
-      document.getElementById('playerHls').classList.remove('show');
+
+    // ─── HLS Player ────────────────────────────────────────────────
+    function playM3u8(url){
+      const video=document.getElementById('video');
       if(hls){hls.destroy();hls=null;}
-      const v=document.getElementById('video');v.pause();v.src='';
+
+      if(Hls.isSupported()){
+        hls=new Hls({
+          maxBufferLength:15,
+          maxMaxBufferLength:30,
+          liveSyncDurationCount:3,
+          enableWorker:true,
+          lowLatencyMode:true,
+          manifestLoadingTimeOut:15000,
+          levelLoadingTimeOut:15000,
+          fragLoadingTimeOut:20000,
+        });
+        hls.loadSource(url);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED,()=>{
+          video.play().catch(()=>{});
+          setLabel('● LIVE');
+          showLoading(false);
+        });
+        hls.on(Hls.Events.ERROR,(_,data)=>{
+          if(data.fatal){
+            showLoading(false);
+            if(data.type===Hls.ErrorTypes.NETWORK_ERROR){
+              setLabel('RECONNECTING...');
+              setTimeout(()=>{try{hls.startLoad();}catch{}},3000);
+            }else{
+              setLabel('STREAM ERROR',true);
+            }
+          }
+        });
+        // Fallback: hide loading after 10s even if MANIFEST_PARSED didn't fire
+        setTimeout(()=>{showLoading(false);},10000);
+      }else if(video.canPlayType('application/vnd.apple.mpegurl')){
+        video.src=url;
+        video.addEventListener('loadedmetadata',()=>{
+          video.play().catch(()=>{});
+          setLabel('● LIVE');
+          showLoading(false);
+        });
+        video.addEventListener('error',()=>{setLabel('STREAM ERROR',true);showLoading(false);});
+        setTimeout(()=>{showLoading(false);},10000);
+      }else{
+        setLabel('NOT SUPPORTED',true);
+        showLoading(false);
+      }
     }
 
-    function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
-    function escAttr(s){return s.replace(/'/g,"\\'").replace(/"/g,'&quot;');}
+    // ─── Controls ──────────────────────────────────────────────────
+    function togglePlay(){
+      const v=document.getElementById('video');
+      const b=document.getElementById('btnPlayPause');
+      const cp=document.getElementById('centerPlay');
+      if(v.paused){v.play();b.textContent='⏸';cp.classList.remove('show');}
+      else{v.pause();b.textContent='▶';cp.classList.add('show');}
+      resetControlsTimer();
+    }
 
+    function toggleMute(){
+      const v=document.getElementById('video');
+      v.muted=!v.muted;
+      document.getElementById('btnMute').textContent=v.muted?'🔇':'🔊';
+      resetControlsTimer();
+    }
+
+    // ─── Fullscreen (iOS + Android + Desktop) ──────────────────────
+    function goFullscreen(){
+      const container=document.getElementById('playerHls');
+      const video=document.getElementById('video');
+
+      if(isIOS){
+        // iOS Safari: fullscreen only works on <video>
+        if(video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+        else if(video.webkitSupportsFullscreen&&video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+      }else{
+        // Android + Desktop
+        if(container.requestFullscreen) container.requestFullscreen();
+        else if(container.webkitRequestFullscreen) container.webkitRequestFullscreen();
+        else if(container.mozRequestFullScreen) container.mozRequestFullScreen();
+        else if(video.requestFullscreen) video.requestFullscreen();
+        else if(video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+      }
+      // In fullscreen, still hide controls after timeout
+      resetControlsTimer();
+    }
+
+    // Listen for fullscreen changes
+    document.addEventListener('fullscreenchange',onFullscreenChange);
+    document.addEventListener('webkitfullscreenchange',onFullscreenChange);
+    function onFullscreenChange(){
+      const isFS=!!(document.fullscreenElement||document.webkitFullscreenElement);
+      // Could adjust UI if needed
+    }
+
+    // ─── Controls visibility (auto-hide) ───────────────────────────
+    function showControls(){
+      if(!controlsVisible){
+        controlsVisible=true;
+        document.getElementById('playerBar').classList.remove('hidden');
+        document.getElementById('backBtn').classList.remove('hidden');
+        document.getElementById('streamLabel').classList.remove('hidden');
+      }
+      resetControlsTimer();
+    }
+
+    function hideControls(){
+      controlsVisible=false;
+      document.getElementById('playerBar').classList.add('hidden');
+      document.getElementById('backBtn').classList.add('hidden');
+      document.getElementById('streamLabel').classList.add('hidden');
+      document.getElementById('centerPlay').classList.remove('show');
+    }
+
+    function resetControlsTimer(){
+      if(controlsTimer) clearTimeout(controlsTimer);
+      controlsTimer=setTimeout(()=>{
+        const v=document.getElementById('video');
+        // Only hide if video is playing
+        if(v&&!v.paused&&!v.ended) hideControls();
+      },3000);
+    }
+
+    // Tap video area to toggle controls
+    document.getElementById('touchOverlay').addEventListener('click',()=>{
+      if(controlsVisible) hideControls();
+      else showControls();
+    });
+
+    // Also show controls on any player interaction
+    document.getElementById('playerHls').addEventListener('mousemove',showControls);
+    document.getElementById('playerHls').addEventListener('touchstart',()=>{
+      // Don't auto-show on every touch, only on the overlay tap
+    });
+
+    // Double-tap for fullscreen
     let lastTap=0;
-    document.getElementById('playerHls').addEventListener('touchend',e=>{
+    document.getElementById('touchOverlay').addEventListener('touchend',e=>{
       const now=Date.now();
       if(now-lastTap<300){e.preventDefault();goFullscreen();}
       lastTap=now;
     });
+
+    // ─── Close player ──────────────────────────────────────────────
+    function closePlayer(){
+      document.getElementById('playerHls').classList.remove('show');
+      if(hls){hls.destroy();hls=null;}
+      const v=document.getElementById('video');v.pause();v.src='';
+      if(controlsTimer) clearTimeout(controlsTimer);
+      showLoading(false);
+    }
+
+    // ─── Utils ─────────────────────────────────────────────────────
+    function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+    function escAttr(s){return s.replace(/'/g,"\\'").replace(/"/g,'&quot;');}
 
     init();
   </script>
