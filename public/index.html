@@ -5,1031 +5,333 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>NontonX TV</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #000; --bg-card: #0d0d0d; --bg-card-hover: #161616;
-      --bg-surface: #0a0a0a; --bg-elevated: #1a1a1a;
-      --accent: #e11d48; --accent-soft: rgba(225,29,72,0.15);
-      --green: #22c55e; --green-soft: rgba(34,197,94,0.15);
-      --yellow: #eab308; --blue: #3b82f6;
-      --text: #f5f5f5; --text-secondary: #a3a3a3; --text-muted: #525252;
-      --border: #1a1a1a; --border-light: #262626;
-      --radius: 16px; --radius-sm: 10px; --radius-xs: 6px;
-      --shadow: 0 4px 24px rgba(0,0,0,0.5);
-    }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      background: var(--bg); color: var(--text);
-      font-family: 'Inter', -apple-system, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
+    :root{--bg:#000;--card:#0d0d0d;--card-h:#161616;--surf:#0a0a0a;--elev:#1a1a1a;--acc:#e11d48;--acc2:rgba(225,29,72,.15);--grn:#22c55e;--grn2:rgba(34,197,94,.15);--txt:#f5f5f5;--txt2:#a3a3a3;--txt3:#525252;--bdr:#1a1a1a;--bdr2:#262626;--r:16px;--rs:10px;--rx:6px}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:var(--bg);color:var(--txt);font-family:'Inter',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
 
-    /* ─── Header ─────────────────────────────────────────── */
-    .header {
-      position: sticky; top: 0; z-index: 200;
-      background: rgba(0,0,0,0.85); backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      padding: 0 16px; border-bottom: 1px solid var(--border);
-    }
-    .header-top {
-      display: flex; align-items: center; justify-content: space-between;
-      height: 56px;
-    }
-    .logo {
-      display: flex; align-items: center; gap: 10px;
-      font-size: 20px; font-weight: 800; letter-spacing: -0.5px;
-    }
-    .logo-icon {
-      width: 32px; height: 32px; background: var(--accent);
-      border-radius: 8px; display: flex; align-items: center;
-      justify-content: center; font-size: 16px;
-    }
-    .logo span { color: var(--accent); }
-    .header-actions { display: flex; gap: 8px; }
-    .header-btn {
-      width: 38px; height: 38px; border-radius: 10px;
-      background: var(--bg-elevated); border: 1px solid var(--border);
-      color: var(--text-secondary); display: flex; align-items: center;
-      justify-content: center; cursor: pointer; font-size: 16px;
-      transition: all 0.2s;
-    }
-    .header-btn:active { background: var(--bg-card-hover); transform: scale(0.95); }
+    /* Header */
+    .hdr{position:sticky;top:0;z-index:200;background:rgba(0,0,0,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:0 16px;border-bottom:1px solid var(--bdr)}
+    .hdr-top{display:flex;align-items:center;justify-content:space-between;height:52px}
+    .logo{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:800;letter-spacing:-.5px}
+    .logo-i{width:30px;height:30px;background:var(--acc);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff}
+    .logo span{color:var(--acc)}
+    .hdr-btn{width:36px;height:36px;border-radius:10px;background:var(--elev);border:1px solid var(--bdr);color:var(--txt2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px}
 
-    /* ─── Category Tabs ──────────────────────────────────── */
-    .categories {
-      display: flex; gap: 4px; overflow-x: auto;
-      scrollbar-width: none; padding: 0 0 12px;
-      -webkit-overflow-scrolling: touch;
-    }
-    .categories::-webkit-scrollbar { display: none; }
-    .cat-tab {
-      flex-shrink: 0; padding: 7px 16px; border-radius: 20px;
-      background: transparent; border: 1px solid var(--border);
-      color: var(--text-muted); font-size: 13px; font-weight: 600;
-      cursor: pointer; transition: all 0.2s; white-space: nowrap;
-      -webkit-tap-highlight-color: transparent;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .cat-tab.active {
-      background: var(--text); color: var(--bg);
-      border-color: var(--text); box-shadow: 0 0 20px rgba(255,255,255,0.1);
-    }
-    .cat-tab:not(.active):active { background: var(--bg-elevated); }
-    .cat-emoji { font-size: 14px; }
+    /* Tabs */
+    .tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:0 0 10px;-webkit-overflow-scrolling:touch}
+    .tabs::-webkit-scrollbar{display:none}
+    .tab{flex-shrink:0;padding:7px 14px;border-radius:20px;background:transparent;border:1px solid var(--bdr);color:var(--txt3);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px}
+    .tab.on{background:var(--txt);color:var(--bg);border-color:var(--txt)}
+    .tab:not(.on):active{background:var(--elev)}
 
-    /* ─── Player ─────────────────────────────────────────── */
-    .player-wrap {
-      display: none; position: relative; background: #000;
-      width: 100%; aspect-ratio: 16/9; overflow: hidden;
-    }
-    .player-wrap.show { display: block; }
-    .player-wrap video {
-      width: 100%; height: 100%; display: block;
-      object-fit: contain; background: #000;
-    }
+    /* Player */
+    .pw{display:none;position:relative;background:#000;width:100%;aspect-ratio:16/9;overflow:hidden}
+    .pw.show{display:block}
+    .pw video{width:100%;height:100%;display:block;object-fit:contain;background:#000}
+    .pw:fullscreen,.pw:-webkit-full-screen{width:100vw!important;height:100vh!important;aspect-ratio:auto!important;display:flex!important;align-items:center;justify-content:center}
+    .pw:fullscreen video,.pw:-webkit-full-screen video{width:100%;height:100%;object-fit:contain}
+    .pl{position:absolute;top:12px;left:12px;background:rgba(34,197,94,.9);color:#fff;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;z-index:10;transition:opacity .4s;pointer-events:none;display:flex;align-items:center;gap:5px}
+    .pl.err{background:rgba(225,29,72,.9)}.pl.hid{opacity:0}
+    .ld{width:6px;height:6px;background:#fff;border-radius:50%;animation:pulse 1.5s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    .pc{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.6);border:none;color:#fff;font-size:15px;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center}
+    .ctrls{position:absolute;bottom:0;left:0;right:0;padding:14px;background:linear-gradient(transparent,rgba(0,0,0,.9));display:flex;align-items:center;gap:14px;z-index:10;transition:opacity .4s}
+    .ctrls.hid{opacity:0;pointer-events:none}
+    .cb{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:7px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+    .cb:active{background:rgba(255,255,255,.15)}.sp{flex:1}
+    .cp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:68px;height:68px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);display:none;align-items:center;justify-content:center;z-index:10;backdrop-filter:blur(6px)}
+    .cp.show{display:flex}
+    .cp::after{content:'';width:0;height:0;border-style:solid;border-width:13px 0 13px 22px;border-color:transparent transparent transparent #fff;margin-left:4px}
+    .ld-o{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.5);z-index:8}
+    .ld-o.show{display:flex}
+    .spn{width:32px;height:32px;border:3px solid rgba(255,255,255,.15);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .tz{position:absolute;inset:0;z-index:6}
+    .svg{width:20px;height:20px;fill:currentColor}
 
-    /* Fullscreen */
-    .player-wrap:fullscreen, .player-wrap:-webkit-full-screen {
-      width: 100vw!important; height: 100vh!important;
-      aspect-ratio: auto!important; display: flex!important;
-      align-items: center; justify-content: center;
-    }
-    .player-wrap:fullscreen video, .player-wrap:-webkit-full-screen video {
-      width: 100%; height: 100%; object-fit: contain;
-    }
+    /* Content */
+    .ct{padding:14px;padding-bottom:90px}
+    .sec{margin-bottom:24px}
+    .sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .st{font-size:16px;font-weight:700;letter-spacing:-.3px;display:flex;align-items:center;gap:7px}
+    .sc{font-size:11px;color:var(--txt3);font-weight:500;background:var(--elev);padding:3px 7px;border-radius:5px}
 
-    /* Player overlays */
-    .player-label {
-      position: absolute; top: 12px; left: 12px;
-      background: rgba(34,197,94,0.9); color: #fff;
-      padding: 5px 12px; border-radius: 6px;
-      font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
-      text-transform: uppercase; z-index: 10;
-      transition: opacity 0.4s; pointer-events: none;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .player-label.error { background: rgba(225,29,72,0.9); }
-    .player-label.hidden { opacity: 0; }
-    .live-dot {
-      width: 6px; height: 6px; background: #fff;
-      border-radius: 50%; animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    /* Live banner */
+    .lb{background:linear-gradient(135deg,#1a0008,#0d0d0d 50%,#000d1a);border:1px solid var(--bdr);border-radius:var(--r);padding:14px;margin-bottom:18px;position:relative;overflow:hidden}
+    .lb::before{content:'';position:absolute;top:-50%;right:-20%;width:200px;height:200px;background:radial-gradient(circle,var(--acc2),transparent 70%)}
+    .lb-h{display:flex;align-items:center;gap:7px;margin-bottom:10px;position:relative}
+    .live-b{background:var(--acc);color:#fff;padding:3px 9px;border-radius:4px;font-size:10px;font-weight:800;letter-spacing:1px;animation:pulse 2s infinite}
+    .lb-t{font-size:12px;color:var(--txt2)}
+    .lb-m{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;position:relative}
+    .lb-m::-webkit-scrollbar{display:none}
 
-    .player-close {
-      position: absolute; top: 12px; right: 12px;
-      width: 36px; height: 36px; border-radius: 50%;
-      background: rgba(0,0,0,0.6); border: none; color: #fff;
-      font-size: 16px; cursor: pointer; z-index: 10;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s;
-    }
-    .player-close:active { transform: scale(0.9); }
+    /* Match card */
+    .mc{flex-shrink:0;width:240px;background:var(--card);border:1px solid var(--bdr);border-radius:var(--rs);overflow:hidden;cursor:pointer;transition:all .2s}
+    .mc:active{transform:scale(.97);border-color:var(--bdr2)}
+    .mc-t{padding:12px 12px 8px;display:flex;align-items:center;justify-content:space-between}
+    .mc-l{font-size:11px;color:var(--txt3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+    .mc-s{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px}
+    .mc-s.live{background:var(--acc2);color:var(--acc)}.mc-s.up{background:var(--elev);color:var(--txt3)}
+    .mc-tm{padding:0 12px 12px}
+    .mc-r{display:flex;align-items:center;gap:8px;padding:5px 0}
+    .mc-f{width:26px;height:26px;border-radius:50%;background:var(--elev);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+    .mc-n{font-size:13px;font-weight:600}
+    .mc-vs{text-align:center;padding:2px 0;font-size:10px;color:var(--txt3);font-weight:600}
+    .mc-b{padding:8px 12px;border-top:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
+    .mc-st{font-size:11px;color:var(--txt3);display:flex;align-items:center;gap:4px}
+    .mc-p{width:26px;height:26px;border-radius:50%;background:var(--acc);display:flex;align-items:center;justify-content:center}
+    .mc-p::after{content:'';width:0;height:0;border-style:solid;border-width:4px 0 4px 8px;border-color:transparent transparent transparent #fff;margin-left:2px}
 
-    .player-controls {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      padding: 16px; background: linear-gradient(transparent, rgba(0,0,0,0.9));
-      display: flex; align-items: center; gap: 16px; z-index: 10;
-      transition: opacity 0.4s;
-    }
-    .player-controls.hidden { opacity: 0; pointer-events: none; }
-    .ctrl-btn {
-      background: none; border: none; color: #fff;
-      font-size: 20px; cursor: pointer; padding: 8px;
-      border-radius: 8px; transition: all 0.15s;
-      display: flex; align-items: center; justify-content: center;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .ctrl-btn:active { background: rgba(255,255,255,0.15); }
-    .ctrl-spacer { flex: 1; }
+    /* Channel grid */
+    .cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+    .cc{background:var(--card);border:1px solid var(--bdr);border-radius:var(--rs);padding:14px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+    .cc:active{background:var(--card-h);transform:scale(.97)}
+    .ci{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px}
+    .ci.bein{background:linear-gradient(135deg,#dc2626,#991b1b)}.ci.fox{background:linear-gradient(135deg,#1d4ed8,#1e3a8a)}.ci.alk{background:linear-gradient(135deg,#059669,#047857)}.ci.pre{background:linear-gradient(135deg,#7c3aed,#5b21b6)}.ci.tyc{background:linear-gradient(135deg,#2563eb,#1d4ed8)}.ci.tvri{background:linear-gradient(135deg,#0ea5e9,#0284c7)}.ci.default{background:linear-gradient(135deg,#1a1a2e,#16213e)}
+    .cn{font-size:12px;font-weight:600;line-height:1.3}
+    .cd{font-size:10px;color:var(--txt3);display:flex;align-items:center;gap:3px}
+    .cd .dot{width:5px;height:5px;border-radius:50%;background:var(--grn)}
 
-    /* Center play */
-    .center-play {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%,-50%);
-      width: 72px; height: 72px; border-radius: 50%;
-      background: rgba(255,255,255,0.15);
-      border: 2px solid rgba(255,255,255,0.4);
-      display: none; align-items: center; justify-content: center;
-      z-index: 10; transition: all 0.3s;
-      backdrop-filter: blur(8px);
-    }
-    .center-play.show { display: flex; }
-    .center-play::after {
-      content: ''; width: 0; height: 0;
-      border-style: solid; border-width: 14px 0 14px 24px;
-      border-color: transparent transparent transparent #fff;
-      margin-left: 4px;
-    }
+    /* Stream list */
+    .sl{display:flex;flex-direction:column;gap:5px}
+    .si{background:var(--card);border:1px solid var(--bdr);border-radius:var(--rs);padding:12px 14px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px}
+    .si:active{background:var(--card-h);transform:scale(.98)}
+    .si-i{width:36px;height:36px;border-radius:9px;background:var(--elev);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+    .si-n{font-size:13px;font-weight:600}
+    .si-m{font-size:11px;color:var(--txt3);margin-top:1px}
+    .si-q{font-size:10px;font-weight:700;padding:2px 5px;border-radius:4px;background:var(--grn2);color:var(--grn)}
+    .si-a{color:var(--txt3);font-size:16px;flex-shrink:0}
 
-    /* Loading */
-    .player-loading {
-      position: absolute; inset: 0; display: none;
-      align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.5); z-index: 8;
-    }
-    .player-loading.show { display: flex; }
-    .spinner {
-      width: 36px; height: 36px;
-      border: 3px solid rgba(255,255,255,0.15);
-      border-top-color: #fff; border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    /* Back nav */
+    .bk{display:flex;align-items:center;gap:7px;color:var(--txt2);font-size:13px;font-weight:600;cursor:pointer;padding:7px 0;margin-bottom:10px}
+    .bk:active{color:var(--txt)}.bk-a{font-size:16px}
 
-    .touch-zone {
-      position: absolute; inset: 0; z-index: 6;
-    }
+    /* State */
+    .msg{text-align:center;padding:50px 20px;color:var(--txt3);font-size:13px}
+    .msg .spn{width:26px;height:26px;border:3px solid var(--bdr);border-top-color:var(--acc);margin:0 auto 14px}
 
-    /* ─── Content Sections ───────────────────────────────── */
-    .content { padding: 16px; padding-bottom: 100px; }
+    /* Bottom nav */
+    .bn{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--bdr);display:flex;z-index:200;padding:6px 0 env(safe-area-inset-bottom,6px)}
+    .ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0;color:var(--txt3);font-size:10px;font-weight:600;cursor:pointer;transition:color .2s}
+    .ni.on{color:var(--txt)}.ni:active{opacity:.7}
+    .ni-i{font-size:18px;line-height:1}
 
-    .section { margin-bottom: 28px; }
-    .section-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 14px;
-    }
-    .section-title {
-      font-size: 18px; font-weight: 700; letter-spacing: -0.3px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .section-count {
-      font-size: 12px; color: var(--text-muted); font-weight: 500;
-      background: var(--bg-elevated); padding: 3px 8px;
-      border-radius: 6px;
-    }
-
-    /* ─── Live Now Banner ────────────────────────────────── */
-    .live-banner {
-      background: linear-gradient(135deg, #1a0008 0%, #0d0d0d 50%, #000d1a 100%);
-      border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 16px; margin-bottom: 20px;
-      position: relative; overflow: hidden;
-    }
-    .live-banner::before {
-      content: ''; position: absolute; top: -50%; right: -20%;
-      width: 200px; height: 200px;
-      background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
-    }
-    .live-banner-header {
-      display: flex; align-items: center; gap: 8px;
-      margin-bottom: 12px; position: relative;
-    }
-    .live-badge {
-      background: var(--accent); color: #fff;
-      padding: 3px 10px; border-radius: 4px;
-      font-size: 10px; font-weight: 800;
-      letter-spacing: 1px; text-transform: uppercase;
-      animation: pulse 2s infinite;
-    }
-    .live-banner-text {
-      font-size: 12px; color: var(--text-secondary);
-    }
-    .live-banner-matches {
-      display: flex; gap: 10px; overflow-x: auto;
-      scrollbar-width: none; position: relative;
-      -webkit-overflow-scrolling: touch;
-    }
-    .live-banner-matches::-webkit-scrollbar { display: none; }
-
-    /* ─── Match Cards ────────────────────────────────────── */
-    .match-card {
-      flex-shrink: 0; width: 260px;
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); overflow: hidden;
-      cursor: pointer; transition: all 0.2s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .match-card:active { transform: scale(0.97); border-color: var(--border-light); }
-    .match-card-top {
-      padding: 14px 14px 10px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .match-league {
-      font-size: 11px; color: var(--text-muted);
-      font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .match-status {
-      font-size: 10px; font-weight: 700; padding: 2px 8px;
-      border-radius: 4px; text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .match-status.live { background: var(--accent-soft); color: var(--accent); }
-    .match-status.upcoming { background: var(--bg-elevated); color: var(--text-muted); }
-    .match-teams { padding: 0 14px 14px; }
-    .match-team {
-      display: flex; align-items: center; gap: 10px;
-      padding: 6px 0;
-    }
-    .team-flag {
-      width: 28px; height: 28px; border-radius: 50%;
-      background: var(--bg-elevated); display: flex;
-      align-items: center; justify-content: center;
-      font-size: 14px; flex-shrink: 0;
-    }
-    .team-name { font-size: 14px; font-weight: 600; }
-    .match-vs {
-      text-align: center; padding: 2px 0;
-      font-size: 11px; color: var(--text-muted); font-weight: 600;
-    }
-    .match-card-bottom {
-      padding: 10px 14px; border-top: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .match-streams {
-      font-size: 11px; color: var(--text-muted);
-      display: flex; align-items: center; gap: 4px;
-    }
-    .match-play-btn {
-      width: 28px; height: 28px; border-radius: 50%;
-      background: var(--accent); display: flex;
-      align-items: center; justify-content: center;
-    }
-    .match-play-btn::after {
-      content: ''; width: 0; height: 0;
-      border-style: solid; border-width: 5px 0 5px 9px;
-      border-color: transparent transparent transparent #fff;
-      margin-left: 2px;
-    }
-
-    /* ─── Channel Grid (for NontonX servers) ─────────────── */
-    .channel-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 10px;
-    }
-    .channel-card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); padding: 16px;
-      cursor: pointer; transition: all 0.2s;
-      -webkit-tap-highlight-color: transparent;
-      display: flex; flex-direction: column; align-items: center;
-      gap: 10px; text-align: center;
-    }
-    .channel-card:active {
-      background: var(--bg-card-hover);
-      transform: scale(0.97);
-    }
-    .channel-icon {
-      width: 48px; height: 48px; border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px;
-    }
-    .channel-icon.moto { background: linear-gradient(135deg, #dc2626, #991b1b); }
-    .channel-icon.f1 { background: linear-gradient(135deg, #e11d48, #9f1239); }
-    .channel-icon.wsbk { background: linear-gradient(135deg, #2563eb, #1e40af); }
-    .channel-icon.tv { background: linear-gradient(135deg, #7c3aed, #5b21b6); }
-    .channel-icon.football { background: linear-gradient(135deg, #16a34a, #15803d); }
-    .channel-name { font-size: 13px; font-weight: 600; }
-    .channel-status {
-      font-size: 10px; color: var(--text-muted);
-      display: flex; align-items: center; gap: 4px;
-    }
-    .channel-status .dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--green);
-    }
-
-    /* ─── Stream List (providers) ────────────────────────── */
-    .stream-list { display: flex; flex-direction: column; gap: 6px; }
-    .stream-item {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: var(--radius-sm); padding: 14px 16px;
-      cursor: pointer; transition: all 0.15s;
-      -webkit-tap-highlight-color: transparent;
-      display: flex; align-items: center; gap: 12px;
-    }
-    .stream-item:active {
-      background: var(--bg-card-hover); transform: scale(0.98);
-    }
-    .stream-icon {
-      width: 40px; height: 40px; border-radius: 10px;
-      background: var(--bg-elevated); display: flex;
-      align-items: center; justify-content: center;
-      font-size: 16px; flex-shrink: 0;
-    }
-    .stream-info { flex: 1; min-width: 0; }
-    .stream-name { font-size: 14px; font-weight: 600; }
-    .stream-meta {
-      font-size: 12px; color: var(--text-muted); margin-top: 2px;
-    }
-    .stream-quality {
-      font-size: 10px; font-weight: 700; padding: 2px 6px;
-      border-radius: 4px; background: var(--green-soft);
-      color: var(--green);
-    }
-    .stream-arrow {
-      color: var(--text-muted); font-size: 18px; flex-shrink: 0;
-    }
-
-    /* ─── Back nav ───────────────────────────────────────── */
-    .back-nav {
-      display: flex; align-items: center; gap: 8px;
-      color: var(--text-secondary); font-size: 14px;
-      font-weight: 600; cursor: pointer; padding: 8px 0;
-      margin-bottom: 12px; -webkit-tap-highlight-color: transparent;
-    }
-    .back-nav:active { color: var(--text); }
-    .back-arrow { font-size: 18px; }
-
-    /* ─── Loading / Empty ────────────────────────────────── */
-    .state-msg {
-      text-align: center; padding: 60px 20px;
-      color: var(--text-muted); font-size: 14px;
-    }
-    .state-msg .spinner {
-      width: 28px; height: 28px;
-      border: 3px solid var(--border);
-      border-top-color: var(--accent);
-      margin: 0 auto 16px;
-    }
-
-    /* ─── Mobile Bottom Nav ──────────────────────────────── */
-    .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: rgba(0,0,0,0.92); backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid var(--border);
-      display: flex; z-index: 200;
-      padding: 8px 0 env(safe-area-inset-bottom, 8px);
-    }
-    .nav-item {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; gap: 3px; padding: 6px 0;
-      color: var(--text-muted); font-size: 10px;
-      font-weight: 600; cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      transition: color 0.2s;
-    }
-    .nav-item.active { color: var(--text); }
-    .nav-item:active { opacity: 0.7; }
-    .nav-icon { font-size: 20px; line-height: 1; }
-
-    /* ─── Search Modal ───────────────────────────────────── */
-    .search-overlay {
-      position: fixed; inset: 0; z-index: 300;
-      background: rgba(0,0,0,0.95); backdrop-filter: blur(20px);
-      display: none; flex-direction: column;
-    }
-    .search-overlay.show { display: flex; }
-    .search-header {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 16px; border-bottom: 1px solid var(--border);
-    }
-    .search-input {
-      flex: 1; background: var(--bg-elevated); border: 1px solid var(--border);
-      border-radius: 10px; padding: 10px 14px;
-      color: var(--text); font-size: 15px; font-family: inherit;
-      outline: none;
-    }
-    .search-input::placeholder { color: var(--text-muted); }
-    .search-close {
-      color: var(--text-secondary); font-size: 14px;
-      font-weight: 600; cursor: pointer; padding: 8px;
-    }
-    .search-results { flex: 1; overflow-y: auto; padding: 16px; }
+    /* Search */
+    .so{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.95);backdrop-filter:blur(20px);display:none;flex-direction:column}
+    .so.show{display:flex}
+    .s-h{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--bdr)}
+    .s-i{flex:1;background:var(--elev);border:1px solid var(--bdr);border-radius:9px;padding:9px 12px;color:var(--txt);font-size:14px;font-family:inherit;outline:none}
+    .s-i::placeholder{color:var(--txt3)}
+    .s-c{color:var(--txt2);font-size:13px;font-weight:600;cursor:pointer;padding:7px}
+    .s-r{flex:1;overflow-y:auto;padding:14px}
 
     /* SVG icon */
-    .icon-svg { width: 20px; height: 20px; fill: currentColor; }
+    .svg{width:20px;height:20px;fill:currentColor}
   </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <div class="header">
-    <div class="header-top">
-      <div class="logo">
-        <div class="logo-icon">▶</div>
-        Nonton<span>X</span>
-      </div>
-      <div class="header-actions">
-        <div class="header-btn" onclick="openSearch()">🔍</div>
-        <div class="header-btn" onclick="location.reload()">↻</div>
+  <div class="hdr">
+    <div class="hdr-top">
+      <div class="logo"><div class="logo-i">▶</div>Nonton<span>X</span></div>
+      <div style="display:flex;gap:6px">
+        <div class="hdr-btn" onclick="openSearch()">🔍</div>
+        <div class="hdr-btn" onclick="location.reload()">↻</div>
       </div>
     </div>
-    <div class="categories" id="categories"></div>
+    <div class="tabs" id="tabs"></div>
   </div>
 
-  <!-- Player -->
-  <div class="player-wrap" id="playerWrap">
-    <video id="video" playsinline webkit-playsinline autoplay muted></video>
-    <div class="player-label" id="playerLabel"><div class="live-dot"></div> CONNECTING</div>
-    <div class="player-loading" id="playerLoading"><div class="spinner"></div></div>
-    <div class="touch-zone" id="touchZone"></div>
-    <div class="center-play" id="centerPlay" onclick="togglePlay()"></div>
-    <div class="player-controls" id="playerControls">
-      <button class="ctrl-btn" id="btnPlay" onclick="togglePlay()">⏸</button>
-      <button class="ctrl-btn" id="btnMute" onclick="toggleMute()">🔇</button>
-      <div class="ctrl-spacer"></div>
-      <button class="ctrl-btn" id="btnFs" onclick="goFullscreen()">
-        <svg class="icon-svg" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-      </button>
+  <div class="pw" id="pw">
+    <video id="vid" playsinline webkit-playsinline autoplay muted></video>
+    <div class="pl" id="pl"><div class="ld"></div>CONNECTING</div>
+    <div class="ld-o" id="lo"><div class="spn"></div></div>
+    <div class="tz" id="tz"></div>
+    <div class="cp" id="cp" onclick="togPlay()"></div>
+    <div class="ctrls" id="ct">
+      <button class="cb" id="bp" onclick="togPlay()">⏸</button>
+      <button class="cb" id="bm" onclick="togMute()">🔇</button>
+      <div class="sp"></div>
+      <button class="cb" id="bf" onclick="goFs()"><svg class="svg" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg></button>
     </div>
-    <button class="player-close" id="playerClose" onclick="closePlayer()">✕</button>
+    <button class="pc" id="pcl" onclick="closeP()">✕</button>
   </div>
 
-  <!-- Iframe fallback -->
-  <div id="iframeWrap" style="display:none;position:relative">
-    <iframe id="iframePlayer" style="width:100%;aspect-ratio:16/9;border:none;background:#000"
-      allowfullscreen allow="autoplay; fullscreen; picture-in-picture; encrypted-media"></iframe>
-    <button class="player-close" onclick="closeIframe()" style="position:absolute;top:12px;right:12px">✕</button>
+  <div id="iw" style="display:none;position:relative">
+    <iframe id="ifr" style="width:100%;aspect-ratio:16/9;border:none;background:#000" allowfullscreen allow="autoplay;fullscreen;picture-in-picture;encrypted-media"></iframe>
+    <button class="pc" onclick="closeI()" style="position:absolute;top:12px;right:12px">✕</button>
   </div>
 
-  <!-- Content -->
-  <div class="content" id="content">
-    <div class="state-msg"><div class="spinner"></div>Memuat channel...</div>
+  <div class="ct" id="ct2"><div class="msg"><div class="spn"></div>Memuat...</div></div>
+
+  <div class="bn" id="bn">
+    <div class="ni on" data-s="football" onclick="nav(this)"><div class="ni-i">⚽</div>Football</div>
+    <div class="ni" data-s="sportstv" onclick="nav(this)"><div class="ni-i">📡</div>Sports TV</div>
+    <div class="ni" data-s="motogp" onclick="nav(this)"><div class="ni-i">🏍️</div>MotoGP</div>
+    <div class="ni" data-s="f1" onclick="nav(this)"><div class="ni-i">🏎️</div>F1</div>
   </div>
 
-  <!-- Bottom Nav -->
-  <div class="bottom-nav" id="bottomNav">
-    <div class="nav-item active" data-sport="football" onclick="navTo(this)">
-      <div class="nav-icon">⚽</div>Football
+  <div class="so" id="so">
+    <div class="s-h">
+      <input class="s-i" id="si" placeholder="Cari match..." oninput="doSearch(this.value)">
+      <div class="s-c" onclick="closeSearch()">Batal</div>
     </div>
-    <div class="nav-item" data-sport="motogp" onclick="navTo(this)">
-      <div class="nav-icon">🏍️</div>MotoGP
-    </div>
-    <div class="nav-item" data-sport="f1" onclick="navTo(this)">
-      <div class="nav-icon">🏎️</div>F1
-    </div>
-    <div class="nav-item" data-sport="worldsbk" onclick="navTo(this)">
-      <div class="nav-icon">🏁</div>WSBK
-    </div>
-    <div class="nav-item" data-sport="randomtv" onclick="navTo(this)">
-      <div class="nav-icon">📺</div>TV
-    </div>
-    <div class="nav-item" data-sport="sportstv" onclick="navTo(this)">
-      <div class="nav-icon">📡</div>Sports
-    </div>
-  </div>
-
-  <!-- Search -->
-  <div class="search-overlay" id="searchOverlay">
-    <div class="search-header">
-      <input class="search-input" id="searchInput" placeholder="Cari match / channel..." oninput="doSearch(this.value)">
-      <div class="search-close" onclick="closeSearch()">Batal</div>
-    </div>
-    <div class="search-results" id="searchResults"></div>
+    <div class="s-r" id="sr"></div>
   </div>
 
   <script>
-    const API = '';
-    let currentSport = 'football', hls = null, sports = [], sportSource = {};
-    let allMatches = [], controlsTimer = null, controlsVisible = true;
-    let isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
-    let isAndroid = /Android/i.test(navigator.userAgent);
-    let hasUserGesture = false;
+    const API='';
+    let cur='football',hls=null,sports=[],src={},allM=[],cTimer=null,cVis=true,gesture=false;
+    let isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+    let isAnd=/Android/i.test(navigator.userAgent);
 
-    // ─── Init ──────────────────────────────────────────────
-    async function init() {
-      try {
-        const res = await fetch(`${API}/api/sports`);
-        sports = await res.json();
-        sports.forEach(s => sportSource[s.key] = s.source);
-        renderCategories();
-        loadListings(currentSport);
-      } catch {
-        document.getElementById('content').innerHTML = '<div class="state-msg">Server offline. Refresh halaman.</div>';
+    async function init(){
+      try{
+        const r=await fetch(`${API}/api/sports`);sports=await r.json();
+        sports.forEach(s=>src[s.key]=s.source);renderTabs();load(cur);
+      }catch{el('ct2').innerHTML='<div class="msg">Server offline.</div>'}
+    }
+
+    function renderTabs(){
+      el('tabs').innerHTML=sports.map(s=>`<div class="tab ${s.key===cur?'on':''}" onclick="switchS('${s.key}')">${s.label}</div>`).join('');
+    }
+
+    function switchS(k){cur=k;renderTabs();updNav(k);closeP();closeI();load(k)}
+    function nav(e){switchS(e.dataset.s)}
+    function updNav(s){document.querySelectorAll('.ni').forEach(n=>n.classList.toggle('on',n.dataset.s===s))}
+
+    async function load(sport){
+      const c=el('ct2');c.innerHTML='<div class="msg"><div class="spn"></div>Memuat...</div>';
+      try{
+        const r=await fetch(`${API}/api/listings/${sport}`);const d=await r.json();
+        if(!d.length){c.innerHTML='<div class="msg">Tidak ada channel.</div>';return}
+        if(src[sport]==='nontonx')renderNx(d,sport);
+        else if(src[sport]==='footybitez')renderFB(d);
+        else if(src[sport]==='sportstv')renderSTV(d);
+      }catch{c.innerHTML='<div class="msg">Gagal memuat.</div>'}
+    }
+
+    // NontonX
+    function renderNx(servers,sport){
+      const l=sports.find(s=>s.key===sport)?.label||sport;
+      const em={motogp:'🏍️',f1:'🏎️',worldsbk:'🏁',randomtv:'📺'};
+      el('ct2').innerHTML=`<div class="sec"><div class="sh"><div class="st">${em[sport]||'📺'} ${l}</div><div class="sc">${servers.length} server</div></div><div class="cg">${servers.map(s=>`<div class="cc" onclick="playUrl('${esc(s.url)}')"><div class="ci default">${em[sport]||'📺'}</div><div class="cn">${esc(s.name)}</div><div class="cd"><div class="dot"></div>Online</div></div>`).join('')}</div></div>`;
+    }
+
+    // Sports TV
+    function renderSTV(channels){
+      const cats={};channels.forEach(ch=>{if(!cats[ch.category])cats[ch.category]=[];cats[ch.category].push(ch)});
+      let h='';
+      for(const[k,chs]of Object.entries(cats)){
+        h+=`<div class="sec"><div class="sh"><div class="st">${k==='Football'?'⚽':'🏏'} ${k}</div><div class="sc">${chs.length} ch</div></div><div class="cg">${chs.map(ch=>`<div class="cc" onclick="playDirect('${esc(ch.url)}')"><div class="ci ${ch.cls||'default'}">${ch.logo}</div><div class="cn">${esc(ch.name)}</div><div class="cd"><div class="dot"></div>Live</div></div>`).join('')}</div></div>`;
       }
+      el('ct2').innerHTML=h;
     }
 
-    function renderCategories() {
-      document.getElementById('categories').innerHTML = sports.map(s =>
-        `<div class="cat-tab ${s.key===currentSport?'active':''}" onclick="switchSport('${s.key}')">
-          <span class="cat-emoji">${s.label.split(' ')[0]}</span>${s.label.split(' ').slice(1).join(' ')}
-        </div>`
-      ).join('');
-    }
-
-    function switchSport(key) {
-      currentSport = key;
-      renderCategories();
-      updateNav(key);
-      closePlayer(); closeIframe();
-      loadListings(key);
-    }
-
-    function navTo(el) {
-      const sport = el.dataset.sport;
-      switchSport(sport);
-    }
-
-    function updateNav(sport) {
-      document.querySelectorAll('.nav-item').forEach(n => {
-        n.classList.toggle('active', n.dataset.sport === sport);
-      });
-    }
-
-    // ─── Listings ──────────────────────────────────────────
-    async function loadListings(sport) {
-      const c = document.getElementById('content');
-      c.innerHTML = '<div class="state-msg"><div class="spinner"></div>Memuat channel...</div>';
-      try {
-        const res = await fetch(`${API}/api/listings/${sport}`);
-        const data = await res.json();
-        if (!data.length) { c.innerHTML = '<div class="state-msg">Tidak ada channel tersedia.</div>'; return; }
-        if (sportSource[sport] === 'nontonx') renderNontonX(data, sport);
-        else if (sportSource[sport] === 'footybitez') renderFootball(data, sport);
-        else if (sportSource[sport] === 'sportstv') renderSportsTV(data, sport);
-      } catch {
-        c.innerHTML = '<div class="state-msg">Gagal memuat. Coba lagi.</div>';
+    // Football
+    function renderFB(matches){
+      allM=matches;
+      const live=matches.filter(m=>m.isLive),up=matches.filter(m=>!m.isLive);
+      let h='';
+      if(live.length){
+        h+=`<div class="lb"><div class="lb-h"><div class="live-b">● LIVE</div><div class="lb-t">${live.length} pertandingan</div></div><div class="lb-m">${live.map(m=>mc(m,1)).join('')}</div></div>`;
       }
-    }
-
-    // ─── NontonX (MotoGP, F1, WSBK, TV) ───────────────────
-    function renderNontonX(servers, sport) {
-      const label = sports.find(s => s.key === sport)?.label || sport;
-      const icons = { motogp:'moto', f1:'f1', worldsbk:'wsbk', randomtv:'tv' };
-      const iconClass = icons[sport] || 'tv';
-      const emojis = { motogp:'🏍️', f1:'🏎️', worldsbk:'🏁', randomtv:'📺' };
-
-      document.getElementById('content').innerHTML = `
-        <div class="section">
-          <div class="section-header">
-            <div class="section-title">${emojis[sport] || '📺'} ${label}</div>
-            <div class="section-count">${servers.length} server</div>
-          </div>
-          <div class="channel-grid">
-            ${servers.map(s => `
-              <div class="channel-card" onclick="playFromUrl('${esc(s.url)}')">
-                <div class="channel-icon ${iconClass}">${emojis[sport] || '📺'}</div>
-                <div class="channel-name">${esc(s.name)}</div>
-                <div class="channel-status"><div class="dot"></div>Online</div>
-              </div>
-            `).join('')}
-          </div>
-        </div>`;
-    }
-
-    // ─── Sports TV (IPTV Channels) ─────────────────────────
-    function renderSportsTV(channels, sport) {
-      const categories = {};
-      channels.forEach(ch => {
-        if (!categories[ch.category]) categories[ch.category] = [];
-        categories[ch.category].push(ch);
-      });
-
-      let html = '';
-      for (const [cat, chans] of Object.entries(categories)) {
-        html += `
-        <div class="section">
-          <div class="section-header">
-            <div class="section-title">${cat === 'Football' ? '⚽' : '🏏'} ${cat}</div>
-            <div class="section-count">${chans.length} channel</div>
-          </div>
-          <div class="channel-grid">
-            ${chans.map(ch => `
-              <div class="channel-card" onclick="playDirect('${esc(ch.url)}')">
-                <div class="channel-icon" style="background:linear-gradient(135deg,#1a1a2e,#16213e)">
-                  ${ch.logo}
-                </div>
-                <div class="channel-name">${esc(ch.name)}</div>
-                <div class="channel-status"><div class="dot"></div>Live 24/7</div>
-              </div>
-            `).join('')}
-          </div>
-        </div>`;
+      if(up.length){
+        h+=`<div class="sec"><div class="sh"><div class="st">📅 Akan Datang</div><div class="sc">${up.length}</div></div><div class="lb-m" style="flex-wrap:wrap;gap:8px">${up.map(m=>mc(m,0)).join('')}</div></div>`;
       }
-      document.getElementById('content').innerHTML = html;
+      el('ct2').innerHTML=h;
     }
 
-    // ─── Football (Footybitez) ─────────────────────────────
-    function renderFootball(matches, sport) {
-      allMatches = matches;
-      const live = matches.filter(m => m.isLive);
-      const upcoming = matches.filter(m => !m.isLive);
-
-      let html = '';
-
-      // Live banner
-      if (live.length) {
-        html += `
-        <div class="live-banner">
-          <div class="live-banner-header">
-            <div class="live-badge">● LIVE</div>
-            <div class="live-banner-text">${live.length} pertandingan berlangsung</div>
-          </div>
-          <div class="live-banner-matches">
-            ${live.map(m => renderMatchCard(m, true)).join('')}
-          </div>
-        </div>`;
-      }
-
-      // Upcoming
-      if (upcoming.length) {
-        html += `
-        <div class="section">
-          <div class="section-header">
-            <div class="section-title">📅 Akan Datang</div>
-            <div class="section-count">${upcoming.length} match</div>
-          </div>
-          <div class="live-banner-matches" style="flex-wrap:wrap;gap:10px">
-            ${upcoming.map(m => renderMatchCard(m, false)).join('')}
-          </div>
-        </div>`;
-      }
-
-      document.getElementById('content').innerHTML = html;
+    function mc(m,lv){
+      const t=m.name.split(/\s+vs\s+/i),t1=t[0]?.trim()||m.name,t2=t[1]?.trim()||'';
+      const d=m.url.replace(/'/g,'&#39;').replace(/"/g,'&quot;'),dn=m.name.replace(/'/g,'&#39;').replace(/"/g,'&quot;');
+      return`<div class="mc" data-url="${d}" data-name="${dn}" onclick="mcClick(this)"><div class="mc-t"><div class="mc-l">⚽ Football</div><div class="mc-s ${lv?'live':'up'}">${lv?'● LIVE':'Upcoming'}</div></div><div class="mc-tm"><div class="mc-r"><div class="mc-f">${flag(t1)}</div><div class="mc-n">${esc(t1)}</div></div><div class="mc-vs">VS</div>${t2?`<div class="mc-r"><div class="mc-f">${flag(t2)}</div><div class="mc-n">${esc(t2)}</div></div>`:''}</div><div class="mc-b"><div class="mc-st">🔍 Cari stream...</div><div class="mc-p"></div></div></div>`;
     }
 
-    function renderMatchCard(m, isLive) {
-      const teams = m.name.split(/\s+vs \s+/i);
-      const t1 = teams[0]?.trim() || m.name;
-      const t2 = teams[1]?.trim() || '';
-      const flag1 = getFlag(t1);
-      const flag2 = getFlag(t2);
-      const dataUrl = m.url.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
-      const dataName = m.name.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+    function mcClick(e){const u=e.dataset.url,n=e.dataset.name;if(u&&n)findStreams(u,n)}
 
-      return `
-      <div class="match-card" data-url="${dataUrl}" data-name="${dataName}" onclick="matchCardClick(this)">
-        <div class="match-card-top">
-          <div class="match-league">⚽ Football</div>
-          <div class="match-status ${isLive?'live':'upcoming'}">${isLive?'● LIVE':'Upcoming'}</div>
-        </div>
-        <div class="match-teams">
-          <div class="match-team">
-            <div class="team-flag">${flag1}</div>
-            <div class="team-name">${esc(t1)}</div>
-          </div>
-          <div class="match-vs">VS</div>
-          ${t2 ? `<div class="match-team">
-            <div class="team-flag">${flag2}</div>
-            <div class="team-name">${esc(t2)}</div>
-          </div>` : ''}
-        </div>
-        <div class="match-card-bottom">
-          <div class="match-streams">🔍 Cari stream...</div>
-          <div class="match-play-btn"></div>
-        </div>
-      </div>`;
+    function flag(n){
+      const f={canada:'🇨🇦',bosnia:'🇧🇦',usa:'🇺🇸',paraguay:'🇵🇾',brazil:'🇧🇷',argentina:'🇦🇷',germany:'🇩🇪',france:'🇫🇷',spain:'🇪🇸',italy:'🇮🇹',england:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',portugal:'🇵🇹',netherlands:'🇳🇱',belgium:'🇧🇪',croatia:'🇭🇷',japan:'🇯🇵',korea:'🇰🇷',mexico:'🇲🇽',colombia:'🇨🇴',uruguay:'🇺🇾',india:'🇮🇳',china:'🇨🇳',australia:'🇦🇺',saudi:'🇸🇦',indonesia:'🇮🇩',qatar:'🇶🇦',morocco:'🇲🇦',switzerland:'🇨🇭',turkey:'🇹🇷',iran:'🇮🇷',serbia:'🇷🇸',poland:'🇵🇱',ukraine:'🇺🇦',sweden:'🇸🇪',denmark:'🇩🇰',norway:'🇳🇴',finland:'🇫🇮',greece:'🇬🇷',egypt:'🇪🇬',cameroon:'🇨🇲',senegal:'🇸🇳',ghana:'🇬🇭',nigeria:'🇳🇬',peru:'🇵🇪',chile:'🇨🇱',ecuador:'🇪🇨',venezuela:'🇻🇪',bolivia:'🇧🇴',paraguay:'🇵🇾'};
+      const l=n.toLowerCase();for(const[k,v]of Object.entries(f)){if(l.includes(k))return v}return'⚽';
     }
 
-    function getFlag(name) {
-      const flags = {
-        'canada':'🇨🇦','bosnia':'🇧🇦','usa':'🇺🇸','paraguay':'🇵🇾',
-        'brazil':'🇧🇷','argentina':'🇦🇷','germany':'🇩🇪','france':'🇫🇷',
-        'spain':'🇪🇸','italy':'🇮🇹','england':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','portugal':'🇵🇹',
-        'netherlands':'🇳🇱','belgium':'🇧🇪','croatia':'🇭🇷','japan':'🇯🇵',
-        'korea':'🇰🇷','mexico':'🇲🇽','colombia':'🇨🇴','uruguay':'🇺🇾',
-        'india':'🇮🇳','china':'🇨🇳','australia':'🇦🇺','saudi':'🇸🇦',
-        'indonesia':'🇮🇩','malaysia':'🇲🇾','thailand':'🇹🇭',
-      };
-      const lower = name.toLowerCase();
-      for (const [k,v] of Object.entries(flags)) {
-        if (lower.includes(k)) return v;
-      }
-      return '⚽';
+    async function findStreams(url,name){
+      const c=el('ct2');
+      c.innerHTML=`<div class="bk" onclick="load(cur)"><span class="bk-a">←</span>Kembali</div><div class="sec"><div class="sh"><div class="st">⚽ ${esc(name)}</div></div><div class="msg"><div class="spn"></div>Mencari stream aktif...</div></div>`;
+      try{
+        const ctrl=new AbortController();const to=setTimeout(()=>ctrl.abort(),120000);
+        const r=await fetch(`${API}/api/working-streams?url=${encodeURIComponent(url)}`,{signal:ctrl.signal});clearTimeout(to);
+        const s=await r.json();
+        if(!s.length){c.innerHTML=`<div class="bk" onclick="load(cur)"><span class="bk-a">←</span>Kembali</div><div class="msg">Tidak ada stream aktif.</div>`;return}
+        c.innerHTML=`<div class="bk" onclick="load(cur)"><span class="bk-a">←</span>Kembali</div><div class="sec"><div class="sh"><div class="st">⚽ ${esc(name)}</div><div class="sc">${s.length} stream</div></div><div class="sl">${s.map(x=>`<div class="si" onclick="playDirect('${esc(x.m3u8)}')"><div class="si-i">${pi(x.name)}</div><div style="flex:1;min-width:0"><div class="si-n">${esc(x.name)}</div><div class="si-m">${esc(x.channel||'HD')}</div></div><div class="si-q">HD</div><div class="si-a">›</div></div>`).join('')}</div></div>`;
+      }catch{c.innerHTML=`<div class="bk" onclick="load(cur)"><span class="bk-a">←</span>Kembali</div><div class="msg">Gagal mencari stream.</div>`}
     }
 
-    // ─── Find working streams ──────────────────────────────
-    async function findStreams(matchUrl, matchName) {
-      const c = document.getElementById('content');
-      c.innerHTML = `
-        <div class="back-nav" onclick="loadListings(currentSport)">
-          <span class="back-arrow">←</span> Kembali
-        </div>
-        <div class="section">
-          <div class="section-header">
-            <div class="section-title">⚽ ${esc(matchName)}</div>
-          </div>
-          <div class="state-msg"><div class="spinner"></div>Mencari stream aktif...</div>
-        </div>`;
+    function pi(n){const l=n.toLowerCase();if(l.includes('bein')||l.includes('crack'))return'🔴';if(l.includes('soccer')||l.includes('football'))return'⚽';if(l.includes('sport')||l.includes('stream'))return'📡';return'🎬'}
 
-      try {
-        const ctrl = new AbortController();
-        const timeout = setTimeout(() => ctrl.abort(), 120000);
-        const res = await fetch(`${API}/api/working-streams?url=${encodeURIComponent(matchUrl)}`, { signal: ctrl.signal });
-        clearTimeout(timeout);
-        const streams = await res.json();
+    // Play
+    async function playUrl(url){
+      showP();setL('CONNECTING');showL(true);
+      try{const ctrl=new AbortController();const to=setTimeout(()=>ctrl.abort(),30000);const r=await fetch(`${API}/api/m3u8?url=${encodeURIComponent(url)}`,{signal:ctrl.signal});clearTimeout(to);const d=await r.json();if(d.url)playHls(d.url);else{showL(false);closeP();playI(url)}}catch{showL(false);closeP();playI(url)}
+    }
+    function playDirect(u){showP();setL('CONNECTING');showL(true);playHls(u)}
 
-        if (!streams.length) {
-          c.innerHTML = `
-            <div class="back-nav" onclick="loadListings(currentSport)">
-              <span class="back-arrow">←</span> Kembali
-            </div>
-            <div class="state-msg">Tidak ada stream aktif ditemukan.</div>`;
-          return;
-        }
+    function playHls(url){
+      const v=el('vid');if(hls){hls.destroy();hls=null}
+      if(Hls.isSupported()){
+        hls=new Hls({maxBufferLength:15,maxMaxBufferLength:30,liveSyncDurationCount:3,enableWorker:true,lowLatencyMode:true,manifestLoadingTimeOut:15000,levelLoadingTimeOut:15000,fragLoadingTimeOut:20000});
+        hls.loadSource(url);hls.attachMedia(v);
+        hls.on(Hls.Events.MANIFEST_PARSED,()=>{v.play().catch(()=>{});setL('LIVE');showL(false);autoUn()});
+        hls.on(Hls.Events.ERROR,(_,d)=>{if(d.fatal){showL(false);if(d.type===Hls.ErrorTypes.NETWORK_ERROR){setL('RECONNECTING');setTimeout(()=>{try{hls.startLoad()}catch{}},3000)}else setL('ERROR',1)}});
+        setTimeout(()=>showL(false),10000);
+      }else if(v.canPlayType('application/vnd.apple.mpegurl')){
+        v.src=url;v.addEventListener('loadedmetadata',()=>{v.play().catch(()=>{});setL('LIVE');showL(false);autoUn()});
+        v.addEventListener('error',()=>{setL('ERROR',1);showL(false)});setTimeout(()=>showL(false),10000);
+      }else{setL('NOT SUPPORTED',1);showL(false)}
+    }
+    function autoUn(){if(gesture){el('vid').muted=false;el('bm').textContent='🔊'}}
+    ['click','touchstart','touchend'].forEach(e=>document.addEventListener(e,()=>{gesture=true},{passive:true}));
 
-        c.innerHTML = `
-          <div class="back-nav" onclick="loadListings(currentSport)">
-            <span class="back-arrow">←</span> Kembali
-          </div>
-          <div class="section">
-            <div class="section-header">
-              <div class="section-title">⚽ ${esc(matchName)}</div>
-              <div class="section-count">${streams.length} stream</div>
-            </div>
-            <div class="stream-list">
-              ${streams.map((s, i) => `
-                <div class="stream-item" onclick="playDirect('${esc(s.m3u8)}')">
-                  <div class="stream-icon">${getProviderIcon(s.name)}</div>
-                  <div class="stream-info">
-                    <div class="stream-name">${esc(s.name)}</div>
-                    <div class="stream-meta">${esc(s.channel || 'HD Stream')}</div>
-                  </div>
-                  <div class="stream-quality">HD</div>
-                  <div class="stream-arrow">›</div>
-                </div>
-              `).join('')}
-            </div>
-          </div>`;
-      } catch {
-        c.innerHTML = `
-          <div class="back-nav" onclick="loadListings(currentSport)">
-            <span class="back-arrow">←</span> Kembali
-          </div>
-          <div class="state-msg">Gagal mencari stream.</div>`;
-      }
+    // Player UI
+    function showP(){closeI();const e=el('pw');e.classList.add('show');e.scrollIntoView({behavior:'smooth'});resetC()}
+    function setL(t,i){const e=el('pl');e.innerHTML=t==='LIVE'?'<div class="ld"></div> LIVE':t;e.className=i?'pl err':'pl';if(t==='LIVE')setTimeout(()=>{if(cVis)e.classList.add('hid')},4000)}
+    function showL(s){el('lo').classList.toggle('show',s)}
+    function togPlay(){const v=el('vid');if(v.paused){v.play();el('bp').textContent='⏸';el('cp').classList.remove('show')}else{v.pause();el('bp').textContent='▶';el('cp').classList.add('show')}resetC()}
+    function togMute(){const v=el('vid');v.muted=!v.muted;el('bm').textContent=v.muted?'🔇':'🔊';resetC()}
+
+    function goFs(){
+      const c=el('pw'),v=el('vid');
+      if(isIOS){try{v.webkitEnterFullscreen?.()}catch{}}
+      else{const e=c.requestFullscreen?c:v;try{e.requestFullscreen?.()||e.webkitRequestFullscreen?.()||e.mozRequestFullScreen?.()}catch{}try{screen.orientation?.lock?.('landscape')}catch{}}
+      resetC()
+    }
+    document.addEventListener('fullscreenchange',onFs);document.addEventListener('webkitfullscreenchange',onFs);
+    function onFs(){const f=!!(document.fullscreenElement||document.webkitFullscreenElement);el('bf').innerHTML=f?'<svg class="svg" viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>':'<svg class="svg" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>';if(!f)try{screen.orientation?.unlock?.()}catch{}}
+
+    function showC(){if(!cVis){cVis=true;el('ct').classList.remove('hid');el('pcl').style.display='';el('pl').classList.remove('hid')}resetC()}
+    function hideC(){cVis=false;el('ct').classList.add('hid');el('pcl').style.display='none';el('pl').classList.add('hid');el('cp').classList.remove('show')}
+    function resetC(){if(cTimer)clearTimeout(cTimer);cTimer=setTimeout(()=>{const v=el('vid');if(v&&!v.paused&&!v.ended)hideC()},3000)}
+    el('tz').addEventListener('click',()=>{cVis?hideC():showC()});
+    el('pw').addEventListener('mousemove',showC);
+    let lt=0;el('tz').addEventListener('touchend',e=>{const n=Date.now();if(n-lt<300){e.preventDefault();goFs()}lt=n});
+
+    function closeP(){el('pw').classList.remove('show');if(hls){hls.destroy();hls=null}const v=el('vid');v.pause();v.src='';if(cTimer)clearTimeout(cTimer);showL(false);try{document.fullscreenElement&&document.exitFullscreen()}catch{}}
+    function playI(u){const w=el('iw');el('ifr').src=u;w.style.display='block';w.scrollIntoView({behavior:'smooth'})}
+    function closeI(){el('iw').style.display='none';el('ifr').src='about:blank'}
+
+    // Search
+    function openSearch(){el('so').classList.add('show');el('si').focus()}
+    function closeSearch(){el('so').classList.remove('show');el('si').value=''}
+    function doSearch(q){
+      const r=el('sr');if(!q.trim()){r.innerHTML='';return}
+      const l=q.toLowerCase(),f=allM.filter(m=>m.name.toLowerCase().includes(l));
+      r.innerHTML=f.length?f.map(m=>{const u=m.url.replace(/'/g,'&#39;').replace(/"/g,'&quot;'),n=m.name.replace(/'/g,'&#39;').replace(/"/g,'&quot;');return`<div class="si" data-url="${u}" data-name="${n}" onclick="closeSearch();mcClick(this)"><div class="si-i">${m.isLive?'🔴':'⚽'}</div><div style="flex:1;min-width:0"><div class="si-n">${esc(m.name)}</div><div class="si-m">${m.isLive?'LIVE':'Upcoming'}</div></div><div class="si-a">›</div></div>`}).join(''):'<div class="msg">Tidak ditemukan.</div>';
     }
 
-    function getProviderIcon(name) {
-      const n = name.toLowerCase();
-      if (n.includes('streameast') || n.includes('crack')) return '🔴';
-      if (n.includes('soccer') || n.includes('football')) return '⚽';
-      if (n.includes('sport') || n.includes('stream')) return '📡';
-      if (n.includes('hd') || n.includes('4k')) return '📺';
-      return '🎬';
-    }
-
-    // ─── Play ──────────────────────────────────────────────
-    async function playFromUrl(url) {
-      showPlayer(); setLabel('CONNECTING'); showLoading(true);
-      try {
-        const ctrl = new AbortController();
-        const timeout = setTimeout(() => ctrl.abort(), 30000);
-        const res = await fetch(`${API}/api/m3u8?url=${encodeURIComponent(url)}`, { signal: ctrl.signal });
-        clearTimeout(timeout);
-        const data = await res.json();
-        if (data.url) playM3u8(data.url);
-        else { showLoading(false); closePlayer(); playIframe(url); }
-      } catch { showLoading(false); closePlayer(); playIframe(url); }
-    }
-
-    function playDirect(m3u8Url) {
-      showPlayer(); setLabel('CONNECTING'); showLoading(true);
-      playM3u8(m3u8Url);
-    }
-
-    // ─── HLS Player ────────────────────────────────────────
-    function playM3u8(url) {
-      const video = document.getElementById('video');
-      if (hls) { hls.destroy(); hls = null; }
-
-      if (Hls.isSupported()) {
-        hls = new Hls({
-          maxBufferLength: 15, maxMaxBufferLength: 30,
-          liveSyncDurationCount: 3, enableWorker: true,
-          lowLatencyMode: true, manifestLoadingTimeOut: 15000,
-          levelLoadingTimeOut: 15000, fragLoadingTimeOut: 20000,
-        });
-        hls.loadSource(url); hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          video.play().catch(() => {}); setLabel('LIVE'); showLoading(false); autoUnmute();
-        });
-        hls.on(Hls.Events.ERROR, (_, data) => {
-          if (data.fatal) {
-            showLoading(false);
-            if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-              setLabel('RECONNECTING');
-              setTimeout(() => { try { hls.startLoad(); } catch {} }, 3000);
-            } else setLabel('ERROR', true);
-          }
-        });
-        setTimeout(() => showLoading(false), 10000);
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = url;
-        video.addEventListener('loadedmetadata', () => {
-          video.play().catch(() => {}); setLabel('LIVE'); showLoading(false); autoUnmute();
-        });
-        video.addEventListener('error', () => { setLabel('ERROR', true); showLoading(false); });
-        setTimeout(() => showLoading(false), 10000);
-      } else { setLabel('NOT SUPPORTED', true); showLoading(false); }
-    }
-
-    function autoUnmute() {
-      if (hasUserGesture) {
-        const v = document.getElementById('video');
-        v.muted = false;
-        document.getElementById('btnMute').textContent = '🔊';
-      }
-    }
-    ['click','touchstart','touchend'].forEach(e =>
-      document.addEventListener(e, () => { hasUserGesture = true; }, { passive: true })
-    );
-
-    // ─── Player UI ─────────────────────────────────────────
-    function showPlayer() {
-      closeIframe();
-      const el = document.getElementById('playerWrap');
-      el.classList.add('show');
-      el.scrollIntoView({ behavior: 'smooth' });
-      resetControls();
-    }
-
-    function setLabel(text, isError) {
-      const el = document.getElementById('playerLabel');
-      el.innerHTML = (text === 'LIVE') ? '<div class="live-dot"></div> LIVE' : text;
-      el.className = isError ? 'player-label error' : 'player-label';
-      if (text === 'LIVE') setTimeout(() => { if (controlsVisible) el.classList.add('hidden'); }, 4000);
-    }
-
-    function showLoading(show) {
-      document.getElementById('playerLoading').classList.toggle('show', show);
-    }
-
-    function togglePlay() {
-      const v = document.getElementById('video');
-      if (v.paused) { v.play(); document.getElementById('btnPlay').textContent = '⏸'; document.getElementById('centerPlay').classList.remove('show'); }
-      else { v.pause(); document.getElementById('btnPlay').textContent = '▶'; document.getElementById('centerPlay').classList.add('show'); }
-      resetControls();
-    }
-
-    function toggleMute() {
-      const v = document.getElementById('video');
-      v.muted = !v.muted;
-      document.getElementById('btnMute').textContent = v.muted ? '🔇' : '🔊';
-      resetControls();
-    }
-
-    // ─── Fullscreen ────────────────────────────────────────
-    function goFullscreen() {
-      const c = document.getElementById('playerWrap');
-      const v = document.getElementById('video');
-      if (isIOS) {
-        try { v.webkitEnterFullscreen?.(); } catch {}
-      } else {
-        const el = c.requestFullscreen ? c : v;
-        try {
-          el.requestFullscreen?.() || el.webkitRequestFullscreen?.() || el.mozRequestFullScreen?.();
-        } catch {}
-        try { screen.orientation?.lock?.('landscape'); } catch {}
-      }
-      resetControls();
-    }
-
-    document.addEventListener('fullscreenchange', onFsChange);
-    document.addEventListener('webkitfullscreenchange', onFsChange);
-    function onFsChange() {
-      const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
-      const btn = document.getElementById('btnFs');
-      if (isFs) {
-        btn.innerHTML = '<svg class="icon-svg" viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>';
-      } else {
-        btn.innerHTML = '<svg class="icon-svg" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>';
-        try { screen.orientation?.unlock?.(); } catch {}
-      }
-    }
-
-    // ─── Controls visibility ───────────────────────────────
-    function showControls() {
-      if (!controlsVisible) {
-        controlsVisible = true;
-        document.getElementById('playerControls').classList.remove('hidden');
-        document.getElementById('playerClose').style.display = '';
-        document.getElementById('playerLabel').classList.remove('hidden');
-      }
-      resetControls();
-    }
-
-    function hideControls() {
-      controlsVisible = false;
-      document.getElementById('playerControls').classList.add('hidden');
-      document.getElementById('playerClose').style.display = 'none';
-      document.getElementById('playerLabel').classList.add('hidden');
-      document.getElementById('centerPlay').classList.remove('show');
-    }
-
-    function resetControls() {
-      if (controlsTimer) clearTimeout(controlsTimer);
-      controlsTimer = setTimeout(() => {
-        const v = document.getElementById('video');
-        if (v && !v.paused && !v.ended) hideControls();
-      }, 3000);
-    }
-
-    document.getElementById('touchZone').addEventListener('click', () => {
-      controlsVisible ? hideControls() : showControls();
-    });
-    document.getElementById('playerWrap').addEventListener('mousemove', showControls);
-
-    let lastTap = 0;
-    document.getElementById('touchZone').addEventListener('touchend', e => {
-      const now = Date.now();
-      if (now - lastTap < 300) { e.preventDefault(); goFullscreen(); }
-      lastTap = now;
-    });
-
-    // ─── Close ─────────────────────────────────────────────
-    function closePlayer() {
-      document.getElementById('playerWrap').classList.remove('show');
-      if (hls) { hls.destroy(); hls = null; }
-      const v = document.getElementById('video'); v.pause(); v.src = '';
-      if (controlsTimer) clearTimeout(controlsTimer);
-      showLoading(false);
-      try { document.fullscreenElement && document.exitFullscreen(); } catch {}
-    }
-
-    function playIframe(url) {
-      const w = document.getElementById('iframeWrap');
-      document.getElementById('iframePlayer').src = url;
-      w.style.display = 'block';
-      w.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function closeIframe() {
-      document.getElementById('iframeWrap').style.display = 'none';
-      document.getElementById('iframePlayer').src = 'about:blank';
-    }
-
-    // ─── Search ────────────────────────────────────────────
-    function openSearch() {
-      document.getElementById('searchOverlay').classList.add('show');
-      document.getElementById('searchInput').focus();
-    }
-
-    function closeSearch() {
-      document.getElementById('searchOverlay').classList.remove('show');
-      document.getElementById('searchInput').value = '';
-    }
-
-    function doSearch(q) {
-      const results = document.getElementById('searchResults');
-      if (!q.trim()) { results.innerHTML = ''; return; }
-      const lower = q.toLowerCase();
-      const filtered = allMatches.filter(m => m.name.toLowerCase().includes(lower));
-      results.innerHTML = filtered.length
-        ? filtered.map(m => {
-            const dUrl = m.url.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
-            const dName = m.name.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
-            return `
-          <div class="stream-item" data-url="${dUrl}" data-name="${dName}" onclick="closeSearch(); matchCardClick(this)">
-            <div class="stream-icon">${m.isLive ? '🔴' : '⚽'}</div>
-            <div class="stream-info">
-              <div class="stream-name">${esc(m.name)}</div>
-              <div class="stream-meta">${m.isLive ? 'LIVE' : 'Upcoming'}</div>
-            </div>
-            <div class="stream-arrow">›</div>
-          </div>`;
-          }).join('')
-        : '<div class="state-msg">Tidak ditemukan.</div>';
-    }
-
-    // ─── Match card click handler ──────────────────────────
-    function matchCardClick(el) {
-      const url = el.dataset.url;
-      const name = el.dataset.name;
-      if (url && name) findStreams(url, name);
-    }
-
-    // ─── Utils ─────────────────────────────────────────────
-    function esc(s) {
-      if (typeof s !== 'string') s = String(s);
-      const d = document.createElement('div'); d.textContent = s; return d.innerHTML;
-    }
+    function el(id){return document.getElementById(id)}
+    function esc(s){if(typeof s!=='string')s=String(s);const d=document.createElement('div');d.textContent=s;return d.innerHTML}
 
     init();
   </script>
