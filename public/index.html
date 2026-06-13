@@ -644,9 +644,11 @@
       const t2 = teams[1]?.trim() || '';
       const flag1 = getFlag(t1);
       const flag2 = getFlag(t2);
+      const dataUrl = m.url.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+      const dataName = m.name.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
 
       return `
-      <div class="match-card" onclick="findStreams(${esc(JSON.stringify(m.url))}, ${esc(JSON.stringify(m.name))})">
+      <div class="match-card" data-url="${dataUrl}" data-name="${dataName}" onclick="matchCardClick(this)">
         <div class="match-card-top">
           <div class="match-league">⚽ Football</div>
           <div class="match-status ${isLive?'live':'upcoming'}">${isLive?'● LIVE':'Upcoming'}</div>
@@ -964,17 +966,27 @@
       const lower = q.toLowerCase();
       const filtered = allMatches.filter(m => m.name.toLowerCase().includes(lower));
       results.innerHTML = filtered.length
-        ? filtered.map(m => `
-          <div class="stream-item" onclick="closeSearch(); findStreams(${esc(JSON.stringify(m.url))}, ${esc(JSON.stringify(m.name))})">
+        ? filtered.map(m => {
+            const dUrl = m.url.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+            const dName = m.name.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+            return `
+          <div class="stream-item" data-url="${dUrl}" data-name="${dName}" onclick="closeSearch(); matchCardClick(this)">
             <div class="stream-icon">${m.isLive ? '🔴' : '⚽'}</div>
             <div class="stream-info">
               <div class="stream-name">${esc(m.name)}</div>
               <div class="stream-meta">${m.isLive ? 'LIVE' : 'Upcoming'}</div>
             </div>
             <div class="stream-arrow">›</div>
-          </div>
-        `).join('')
+          </div>`;
+          }).join('')
         : '<div class="state-msg">Tidak ditemukan.</div>';
+    }
+
+    // ─── Match card click handler ──────────────────────────
+    function matchCardClick(el) {
+      const url = el.dataset.url;
+      const name = el.dataset.name;
+      if (url && name) findStreams(url, name);
     }
 
     // ─── Utils ─────────────────────────────────────────────
