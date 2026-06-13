@@ -23,18 +23,43 @@ const SPORTS = {
 
 // ─── IPTV Sports Channels (tested working) ──────────────────────
 const SPORTS_TV_CHANNELS = [
+  // Football / Soccer
+  { name: 'FIFA+ English', url: 'https://jmp2.uk/plu-660c29b5aec9680008f5b4a4.m3u8', logo: '🏆', category: 'Football', cls: 'fifa' },
+  { name: 'FIFA+ Spanish', url: 'https://d63fabad.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXVuZGVkUGFpZA/index.m3u8', logo: '🏆', category: 'Football', cls: 'fifa' },
+  { name: 'FIFA+ French', url: 'https://37b4c228.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXVuZGVkUGFpZA/index.m3u8', logo: '🏆', category: 'Football', cls: 'fifa' },
+  { name: 'FIFA+ US', url: 'https://d2w9q46ikgrcwx.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68074787cc/fifa-plus-us/free/v3/playlist.m3u8', logo: '🏆', category: 'Football', cls: 'fifa' },
   { name: 'beIN SPORTS XTRA', url: 'https://bein-xtra-bein.amagi.tv/playlist.m3u8', logo: '🔴', category: 'Football', cls: 'bein' },
-  { name: 'beIN Sports XTRA ES', url: 'https://dc1644a9jazgj.cloudfront.net/beIN_Sports_Xtra_Espanol.m3u8', logo: '🔴', category: 'Football', cls: 'bein' },
+  { name: 'beIN XTRA ES', url: 'https://dc1644a9jazgj.cloudfront.net/beIN_Sports_Xtra_Espanol.m3u8', logo: '🔴', category: 'Football', cls: 'bein' },
   { name: 'TyC Sports', url: 'https://amg26268-amg26268c14-freelivesports-emea-10267.playouts.now.amagi.tv/ts-us-e2-n2/playlist/amg26268-sportsstudio-tycsports-freelivesportsemea/playlist.m3u8', logo: '🇦🇷', category: 'Football', cls: 'tyc' },
+  { name: 'TyC Sports USA', url: 'http://45.170.130.224:8000/play/a020/index.m3u8', logo: '🇦🇷', category: 'Football', cls: 'tyc' },
   { name: 'FOX Sports AR', url: 'https://jmp2.uk/plu-5a74b8e1e22a61737979c6bf.m3u8', logo: '🔵', category: 'Football', cls: 'fox' },
+  { name: 'Fox Deportes', url: 'https://cors-proxy.cooks.fyi/http://23.237.104.106:8080/USA_FOX_DEPORTES/index.m3u8', logo: '🔵', category: 'Football', cls: 'fox' },
   { name: 'Alkass One', url: 'https://liveeu-gcp.alkassdigital.net/alkass1-p/main.m3u8', logo: '🇶🇦', category: 'Football', cls: 'alk' },
   { name: 'Alkass Two', url: 'https://liveeu-gcp.alkassdigital.net/alkass2-p/main.m3u8', logo: '🇶🇦', category: 'Football', cls: 'alk' },
   { name: 'Alkass Three', url: 'https://liveeu-gcp.alkassdigital.net/alkass3-p/main.m3u8', logo: '🇶🇦', category: 'Football', cls: 'alk' },
   { name: 'Alkass SHOOF', url: 'https://liveeu-gcp.alkassdigital.net/shooflive/main.m3u8', logo: '🇶🇦', category: 'Football', cls: 'alk' },
   { name: 'CCTV Football', url: 'http://38.75.136.137:98/gslb/dsdqpub/fyzq.m3u8?auth=testpub', logo: '🇨🇳', category: 'Football', cls: 'default' },
   { name: 'Futbol TJ', url: 'https://live.teleradiocom.tj/8/3m.m3u8', logo: '🇹🇯', category: 'Football', cls: 'default' },
-  { name: 'Al Iraqia Sport', url: 'https://imn-live.esite-lab.com/hls/iraqia-sports-1.m3u8', logo: '🇮🇶', category: 'Football', cls: 'default' },
   { name: 'TVRI Sport', url: 'https://ott-balancer.tvri.go.id/live/eds/SportHD/hls/SportHD.m3u8', logo: '🇮🇩', category: 'Football', cls: 'tvri' },
+  { name: 'Arena Sport 1', url: 'https://nl1.nghk.ai/ArenaSport1HD/index.m3u8', logo: '🇭🇷', category: 'Football', cls: 'default' },
+  { name: 'Arena Sport 2', url: 'https://nl1.nghk.ai/ArenaSport2HD/index.m3u8', logo: '🇭🇷', category: 'Football', cls: 'default' },
+  { name: 'Digi Sport 1', url: 'http://315e5a5d.ottrast.com/iptv/MM4E93NGF5LADZ/2523/index.m3u8', logo: '🇷🇴', category: 'Football', cls: 'default' },
+  { name: 'Arryadia', url: 'https://stream-lb.livemediama.com/arryadia/hls/master.m3u8', logo: '🇲🇦', category: 'Football', cls: 'default' },
+  { name: 'HTSpor TV', url: 'https://ciner.daioncdn.net/ht-spor/ht-spor.m3u8?app=web', logo: '🇹🇷', category: 'Football', cls: 'default' },
+  { name: 'IRIB 3', url: 'https://ncdn.telewebion.ir/tv3/live/playlist.m3u8', logo: '🇮🇷', category: 'Football', cls: 'default' },
+  // F1 / Motorsport
+  { name: 'F1 Channel', url: 'https://amg12058-c15studio-amg12058c1-lg-us-5787.playouts.now.amagi.tv/playlist/amg12058-c15studio-amg12058c1/playlist.m3u8', logo: '🏎️', category: 'Motorsport', cls: 'f1ch' },
+  { name: 'Red Bull TV', url: 'https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8', logo: '🐂', category: 'Motorsport', cls: 'rb' },
+  // Combat / MMA
+  { name: 'DAZN Combat', url: 'https://dazn-combat-rakuten.amagi.tv/hls/amagi_hls_data_rakutenAA-dazn-combat-rakuten/playlist.m3u8', logo: '🥊', category: 'Combat', cls: 'default' },
+  { name: 'GLORY Kickboxing', url: 'https://6f972d29.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXVuZGVkUGFpZA/index.m3u8', logo: '🥊', category: 'Combat', cls: 'default' },
+  { name: 'Bellator MMA', url: 'https://jmp2.uk/plu-5ebc8688f3697d00072f7cf8.m3u8', logo: '🥊', category: 'Combat', cls: 'default' },
+  { name: 'FITE 24/7', url: 'https://d3d85c7qkywguj.cloudfront.net/scheduler/scheduleMaster/263.m3u8', logo: '🤼', category: 'Combat', cls: 'default' },
+  // Tennis / Other
+  { name: 'Tennis Channel', url: 'https://cdn-ue1-prod.tsv2.amagi.tv/linear/amg01444-tennischannelth-tennischannel-samsungau/playlist.m3u8', logo: '🎾', category: 'Other', cls: 'default' },
+  { name: 'ESPN8 The Ocho', url: 'https://d3b6q2ou5kp8ke.cloudfront.net/ESPNTheOcho.m3u8', logo: '📺', category: 'Other', cls: 'default' },
+  { name: 'fubo Sports', url: 'https://dnf08l6u6uxnz.cloudfront.net/master.m3u8', logo: '📺', category: 'Other', cls: 'default' },
+  { name: 'Unbeaten', url: 'https://d1t5afz6qed3xk.cloudfront.net/Unbeaten.m3u8', logo: '🏃', category: 'Other', cls: 'default' },
 ];
 
 const NONTONX_SERVERS = {
