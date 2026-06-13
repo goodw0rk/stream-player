@@ -500,6 +500,9 @@
     <div class="nav-item" data-sport="randomtv" onclick="navTo(this)">
       <div class="nav-icon">📺</div>TV
     </div>
+    <div class="nav-item" data-sport="sportstv" onclick="navTo(this)">
+      <div class="nav-icon">📡</div>Sports
+    </div>
   </div>
 
   <!-- Search -->
@@ -569,6 +572,7 @@
         if (!data.length) { c.innerHTML = '<div class="state-msg">Tidak ada channel tersedia.</div>'; return; }
         if (sportSource[sport] === 'nontonx') renderNontonX(data, sport);
         else if (sportSource[sport] === 'footybitez') renderFootball(data, sport);
+        else if (sportSource[sport] === 'sportstv') renderSportsTV(data, sport);
       } catch {
         c.innerHTML = '<div class="state-msg">Gagal memuat. Coba lagi.</div>';
       }
@@ -597,6 +601,38 @@
             `).join('')}
           </div>
         </div>`;
+    }
+
+    // ─── Sports TV (IPTV Channels) ─────────────────────────
+    function renderSportsTV(channels, sport) {
+      const categories = {};
+      channels.forEach(ch => {
+        if (!categories[ch.category]) categories[ch.category] = [];
+        categories[ch.category].push(ch);
+      });
+
+      let html = '';
+      for (const [cat, chans] of Object.entries(categories)) {
+        html += `
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">${cat === 'Football' ? '⚽' : '🏏'} ${cat}</div>
+            <div class="section-count">${chans.length} channel</div>
+          </div>
+          <div class="channel-grid">
+            ${chans.map(ch => `
+              <div class="channel-card" onclick="playDirect('${esc(ch.url)}')">
+                <div class="channel-icon" style="background:linear-gradient(135deg,#1a1a2e,#16213e)">
+                  ${ch.logo}
+                </div>
+                <div class="channel-name">${esc(ch.name)}</div>
+                <div class="channel-status"><div class="dot"></div>Live 24/7</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>`;
+      }
+      document.getElementById('content').innerHTML = html;
     }
 
     // ─── Football (Footybitez) ─────────────────────────────

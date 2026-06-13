@@ -18,7 +18,33 @@ const SPORTS = {
   worldsbk:   { label: '🏁 WorldSBK',       source: 'nontonx', nontonxPath: 'wsbkplayer1' },
   f1:         { label: '🏎️ Formula 1',      source: 'nontonx', nontonxPath: 'formulaplayer1' },
   randomtv:   { label: '📺 RandomTV',       source: 'nontonx', nontonxPath: 'randomplayer' },
+  sportstv:   { label: '📡 Sports TV',      source: 'sportstv' },
 };
+
+// ─── IPTV Sports Channels (from iptv-org, tested working) ──────────
+const SPORTS_TV_CHANNELS = [
+  { name: 'beIN SPORTS XTRA', url: 'https://bein-xtra-bein.amagi.tv/playlist.m3u8', logo: '🔴', category: 'Football' },
+  { name: 'beIN Sports XTRA ES', url: 'https://dc1644a9jazgj.cloudfront.net/beIN_Sports_Xtra_Espanol.m3u8', logo: '🔴', category: 'Football' },
+  { name: 'Fox Sports 1', url: 'https://cors-proxy.cooks.fyi/http://190.11.225.124:5000/live/fs1_hd/playlist.m3u8', logo: '🔵', category: 'Football' },
+  { name: 'Fox Sports 2', url: 'https://tvsen7.aynaott.com/foxsports2/index.m3u8', logo: '🔵', category: 'Football' },
+  { name: 'TyC Sports', url: 'https://amg26268-amg26268c14-freelivesports-emea-10267.playouts.now.amagi.tv/ts-us-e2-n2/playlist/amg26268-sportsstudio-tycsports-freelivesportsemea/playlist.m3u8', logo: '🇦🇷', category: 'Football' },
+  { name: 'Alkass One', url: 'https://liveeu-gcp.alkassdigital.net/alkass1-p/main.m3u8', logo: '🇶🇦', category: 'Football' },
+  { name: 'Alkass Two', url: 'https://liveeu-gcp.alkassdigital.net/alkass2-p/main.m3u8', logo: '🇶🇦', category: 'Football' },
+  { name: 'Alkass Three', url: 'https://liveeu-gcp.alkassdigital.net/alkass3-p/main.m3u8', logo: '🇶🇦', category: 'Football' },
+  { name: 'Alkass Four', url: 'https://liveeu-gcp.alkassdigital.net/alkass4-p/main.m3u8', logo: '🇶🇦', category: 'Football' },
+  { name: 'Alkass Five', url: 'https://liveeu-gcp.alkassdigital.net/alkass5-p/main.m3u8', logo: '🇶🇦', category: 'Football' },
+  { name: 'Alkass SHOOF', url: 'https://liveeu-gcp.alkassdigital.net/shooflive/main.m3u8', logo: '🇶🇦', category: 'Football' },
+  { name: 'Premiere FC 1', url: 'https://stm.sinalmycn.com/20000/video.m3u8?token=EkP2qSi13ckjQRLSIDoxI5rMZsF5rZyEYzqWjxD248ScEUPYQ0', logo: '🇧🇷', category: 'Football' },
+  { name: 'Premiere FC 2', url: 'https://stm.sinalmycn.com/20003/video.m3u8?token=EkP2qSi13ckjQRLSIDoxI5rMZsF5rZyEYzqWjxD248ScEUPYQ0', logo: '🇧🇷', category: 'Football' },
+  { name: 'Premiere FC 3', url: 'https://stm.sinalmycn.com/20006/video.m3u8?token=EkP2qSi13ckjQRLSIDoxI5rMZsF5rZyEYzqWjxD248ScEUPYQ0', logo: '🇧🇷', category: 'Football' },
+  { name: 'Premiere FC 4', url: 'https://stm.sinalmycn.com/20009/video.m3u8?token=EkP2qSi13ckjQRLSIDoxI5rMZsF5rZyEYzqWjxD248ScEUPYQ0', logo: '🇧🇷', category: 'Football' },
+  { name: 'Premiere FC 5', url: 'https://stm.sinalmycn.com/20012/video.m3u8?token=EkP2qSi13ckjQRLSIDoxI5rMZsF5rZyEYzqWjxD248ScEUPYQ0', logo: '🇧🇷', category: 'Football' },
+  { name: 'CCTV Football', url: 'http://38.75.136.137:98/gslb/dsdqpub/fyzq.m3u8?auth=testpub', logo: '🇨🇳', category: 'Football' },
+  { name: 'Futbol Tajikistan', url: 'https://live.teleradiocom.tj/8/3m.m3u8', logo: '🇹🇯', category: 'Football' },
+  { name: 'FOX Sports AR', url: 'https://jmp2.uk/plu-5a74b8e1e22a61737979c6bf.m3u8', logo: '🔵', category: 'Football' },
+  { name: 'Star Sports 1', url: 'https://tvsen7.aynaott.com/sspts1/index.m3u8', logo: '🇮🇳', category: 'Cricket' },
+  { name: 'Star Sports 2', url: 'https://tvsen7.aynaott.com/ssport2hd/index.m3u8', logo: '🇮🇳', category: 'Cricket' },
+];
 
 const NONTONX_SERVERS = {
   mgpplayer2:    { label: '🚜 Server Ekonomi', path: 'mgpplayer2' },
@@ -570,6 +596,8 @@ app.get('/api/listings/:sport', async (req, res) => {
       res.json(getNontonXStreams(sport));
     } else if (SPORTS[sport].source === 'footybitez') {
       res.json(await scrapeFootybitez());
+    } else if (SPORTS[sport].source === 'sportstv') {
+      res.json(SPORTS_TV_CHANNELS);
     }
   } catch (err) {
     console.error(`[listings:${sport}] Error:`, err.message);
